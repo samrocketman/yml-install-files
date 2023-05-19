@@ -35,7 +35,8 @@ download_utility() (
   pre_command="$(yq -r ".utility.$2.pre_command // \"\"" "$1")"
   post_command="$(yq -r ".utility.$2.post_command // \"\"" "$1")"
   extension="$(yq -r ".utility.$2.extension // \"\"" "$1")"
-  export arch dest extension extract only os owner perm post_command pre_command url version
+  utility="$2"
+  export arch dest extension extract only os owner perm post_command pre_command url utility version
   if [ -n "${only:-}" ]; then
     if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
       echo "SKIP $2: because matching only: $only" >&2
