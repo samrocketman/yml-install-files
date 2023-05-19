@@ -83,8 +83,16 @@ utility:
     download: https://github.com/goss-org/goss/releases/download/v${version}/goss-${os}-${arch}
   helm:
     <<: *defaults
-    extract: tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm'
+    pre_command: rm -f ${dest}/${utility}
     download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
+    extract: >
+      (
+        if [ ${os} = darwin ]; then
+          tar -xzC ${dest}/ --no-same-owner --strip-components=1 '*/helm';
+        else
+          tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm';
+        fi;
+      )
     os:
       Linux: linux
       Darwin: darwin
@@ -109,18 +117,25 @@ utility:
     download: https://dl.k8s.io/release/v${version}/bin/${os}/${arch}/kubectl
   kubeval:
     <<: *defaults
-    only: "[ ${arch} = x86_64 ]"
-    extract: tar -xzC ${dest}/ --overwrite --no-same-owner kubeval
-    download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-linux-amd64.tar.gz
+    only: "[ ${arch} = amd64 ]"
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+    pre_command: rm -f ${dest}/${utility}
+    extract: tar -xzC ${dest}/ --no-same-owner kubeval
+    download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
   kustomize:
     <<: *defaults
+    pre_command: rm -f ${dest}/${utility}
+    download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner kustomize
     os:
       Linux: linux
     arch:
       x86_64: amd64
       aarch64: arm64
-    extract: tar -xzC ${dest}/ --overwrite --no-same-owner kustomize
-    download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
   minikube:
     <<: *defaults
     os:
