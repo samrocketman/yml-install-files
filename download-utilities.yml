@@ -1,0 +1,135 @@
+versions:
+  cyclonedx: 0.24.2
+  docker-compose: 2.18.1
+  dumb-init: 1.2.5
+  gh: 2.29.0
+  gimme: master
+  goss: 0.3.22
+  helm: 3.12.0
+  jq: 1.6
+  kubectl: 1.27.2
+  kubeval: 0.16.1
+  kustomize: 5.0.3
+  minikube: 1.30.1
+  yq: 4.33.3
+
+
+defaults: &defaults
+  dest: ./scratch
+  perm: '0755'
+utility:
+  helm:
+    <<: *defaults
+    extract: tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm'
+    download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+  dumb-init:
+    <<: *defaults
+    only: "[ ${arch} = Linux ]"
+    download: https://github.com/Yelp/dumb-init/releases/download/v${version}/dumb-init_${version}_${arch}
+  gimme:
+    <<: *defaults
+    download: https://raw.githubusercontent.com/travis-ci/gimme/${version}/gimme
+  kubectl:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    download: https://dl.k8s.io/release/v${version}/bin/${os}/${arch}/kubectl
+  minikube:
+    <<: *defaults
+    os:
+      Linux: linux
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    download: https://github.com/kubernetes/minikube/releases/download/v${version}/minikube-${os}-${arch}
+  kubeval:
+    <<: *defaults
+    only: "[ ${arch} = x86_64 ]"
+    extract: tar -xzC ${dest}/ --overwrite --no-same-owner kubeval
+    download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-linux-amd64.tar.gz
+  kustomize:
+    <<: *defaults
+    os:
+      Linux: linux
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    extract: tar -xzC ${dest}/ --overwrite --no-same-owner kustomize
+    download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
+  jq:
+    <<: *defaults
+    only: "[[ ${arch} = x86_64 ]]"
+    os:
+      Linux: linux64
+      Darwin: osx-amd64
+    download: https://github.com/stedolan/jq/releases/download/jq-${version}/jq-${os}
+  goss:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: alpha-darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    # Mac OS is alpha and Mac only supports AMD64.  Linux supports arm and AMD64
+    only: "[ ! ${os} = alpha-darwin ] || [ ${arch} = amd64 ]"
+    download: https://github.com/goss-org/goss/releases/download/v${version}/goss-${os}-${arch}
+  docker-compose:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      arm64: aarch64
+    download: https://github.com/docker/compose/releases/download/v${version}/docker-compose-${os}-${arch}
+  gh:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: macOS
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    extension: >
+      if [ ${os} = macOS ]; then
+        echo zip;
+      else
+        echo tar.gz;
+      fi
+    extract: >
+      if [ ${extension} = zip ]; then
+        (
+          cat > /tmp/file.zip;
+          unzip -o -j -d ${dest} /tmp/file.zip '*/bin/gh';
+        ) && rm -f /tmp/file.zip || rm -f /tmp/file.zip;
+      else
+        tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh';
+      fi
+    download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
+  yq:
+    <<: *defaults
+    os:
+      Linux: linux
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}
+  cyclonedx:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: osx
+    arch:
+      x86_64: x64
+      aarch64: arm64
+    download: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v${version}/cyclonedx-${os}-${arch}
