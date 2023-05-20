@@ -4,10 +4,15 @@
 
 I created this project to solve the following challenges:
 
-- In docker images, I package common utilities such as `yq`.  I tend to download on different architectures and operating systems.  Handling various download URL formats and processes for different projects can be unique to each project.  Not all utilities are available for all OSes or architectures.
-- For building multiarch images, running the same command regardless of OS or architecture is desirable.
-- Validating the integrity of downloaded utilities is a regular practice.  I wanted to have an easy means of validating downloaded files.
-- Keeping utilities up to date.
+- In docker images, I package common utilities such as `yq`.  I tend to download
+  on different architectures and operating systems.  Handling various download
+  URL formats and processes for different projects can be unique to each
+  project.  Not all utilities are available for all OSes or architectures.
+- For building multi-arch images, running the same command regardless of OS or
+  architecture is desirable.
+- Validating the integrity of downloaded utilities is a regular practice.  I
+  wanted to have an easy means of validating downloaded files.
+- Keeping utilities up to date automatically balancing the above constraints.
 
 ### About Project
 
@@ -174,7 +179,7 @@ then your scripts should be limited to what is available to all operating
 systems.
 
 Avoid any shell variables than the ones listed in the previous section if
-possible.  All scripts get filetered with `envsubst` before executing.
+possible.  All scripts get filtered with `envsubst` before executing.
 
 ### Pre and post command scripts
 
@@ -221,7 +226,7 @@ extract: >
 In the above example, the `stdout` of `curl` is passed to `stdin` of `cat` or
 `tar` depending on matching conditions.
 
-> Note: the above example is a YAML multiline string which results in a single
+> Note: the above example is a YAML multi-line string which results in a single
 > line.  This means you need to write your script as if it were on one line with
 > semicolons and other valid shell syntax.
 
