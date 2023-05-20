@@ -39,9 +39,142 @@ initial testing.
 
 # Requirements
 
+Only Mac OS and Linux is currently supported.  BSD should work also but isn't
+tested.
+
 Running `download-utilities.sh` requires the following installed software:
 
 - Bash
-- coreutils
+- coreutils (BSD or GNU)
 - envsubst
 - yq
+
+# YAML spec
+
+Here's all fields and their definitions.
+
+```yaml
+versions:
+  utility_key: # version number which takes precedence over utility
+utility:
+  # name of utility downloaded to the dest
+  utility_key:
+    dest: /usr/local/bin # destination path to download utility
+    perm: 0755 # optional permission to chmod
+    owner: someuser # option username to chown
+    os: # translation map from uname value to download file value
+    arch: # translation map from arch value to download file value
+    extension: echo tar.gz # optional shell script which should echo the extension
+    only: # a conditional shell script which can skip downloading if false
+    pre_command: # optional shell script run before download
+    downlaod: # a URL to download the utility
+    extract: # pipe the download into this shell script e.g. extraction
+    post_command: # optional shell script run after download, chmod, and chown
+```
+
+# OS and Architectures
+
+You can manually set `os` or `arch`.
+
+- `os` automatically populates by running `uname` command.
+- `arch` automatically populates by running `arch` command.
+
+Translating with YAML.
+
+```yaml
+
+utility:
+  utility_key:
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+```
+
+With the above translations:
+
+- If `uname` returns `Linux` or `Darwin`, then `${os}` variable is populated
+  with `linux` or `darwin`.
+- If `arch` returns `x86_64` or `aarch64`, then `${arch}` variable is populated
+  with `amd64` or `arm64`.
+
+Any values which do not match the translation are left literal and are not
+translated.  For example, if `arch` returns a different value such as `arm64` or
+`386`, then it will not be translated and be the literal value of `${arch}`.
+
+### Variables
+
+All fields get variables set from the YAML or the OS environment.  The following
+is a list of variables.
+
+- `${utility}`
+- `${os}`
+- `${arch}`
+- `${dest}`
+- `${perm}`
+- `${owner}`
+- `${extension}`
+
+All logic written in shell scripts with these variables should be written with
+the translated values.
+
+### Basic shell scripts
+
+Shell scripts may not have any kind of shell variables.  All variables get
+filtered by `envsubst` which means you can't easily set and use shell variables.
+If you intend to support multiple operating systems (like MacOS, Linux, etc);
+then your scripts should be limited to what is available to all operating
+systems.
+
+Avoid any shell variables than the ones listed in the previous section if
+possible.  All scripts get filetered with `envsubst` before executing.
+
+`pre_command` and `post_command` are executed as normal stand alone scripts
+before or after download.
+
+#### `extension` shell script
+
+Should always echo one line and that one line is intended to be a file extension
+for downloading.
+
+```yaml
+extension: echo tar.gz
+```
+
+Because this is a basic shell script you can do some detection and download a
+different extension depending any available variables.
+
+```yaml
+extension: >
+  if [ ${os} = Darwin ]; then
+    echo zip;
+  else
+    echo tar.gz;
+  fi
+```
+
+> Note: the above example is a YAML multiline string which results in a single
+> line.  This means you need to write your script as if it were on one line with
+> semicolons and other valid shell syntax.
+
+#### `only` shell script
+
+The YAML for `only` should just result in a conditional result based on exit
+code.  For example,
+
+```yaml
+only: false
+```
+
+`/bin/false` will never execute scripts because it returns a non-zero exit code.
+An example to only download if the architecture is `x86_64` would be the
+following.
+
+```yaml
+only: "[ ${arch} = x86_64 ]"
+```
+
+> Note: the value of `${arch}` should be considered after variable translation.
+> This example assumes no translation.
