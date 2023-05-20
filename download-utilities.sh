@@ -95,7 +95,7 @@ download_utility() (
   fi
 )
 
-function check_yaml() (
+check_yaml() (
   if [ ! -f "$1" ]; then
     echo "ERROR: $1 does not exist." >&2
     return 1
