@@ -1,6 +1,7 @@
 #!/bin/bash
 # Created by Sam Gleske
 # Fri 19 May 2023 06:01:53 PM EDT
+# MIT Licensed; https://github.com/samrocketman/yml-install-files
 # Ubuntu 20.04.6 LTS
 # Linux 5.15.0-71-generic x86_64
 # GNU bash, version 5.0.17(1)-release (x86_64-pc-linux-gnu)
@@ -8,7 +9,6 @@
 set -euo pipefail
 
 default_yaml="download-utilities.yml"
-
 
 download_utility() (
   download="$(yq -r ".utility.$2.download // \"\"" "$1")"
