@@ -8,7 +8,15 @@
 
 set -euo pipefail
 
-default_yaml="download-utilities.yml"
+default_yaml="${default_yaml:-download-utilities.yml}"
+
+yq() (
+  if [ -x "${TMP_DIR:-}"/yq ]; then
+    "${TMP_DIR:-}"/yq "$@"
+  else
+    command yq "$@"
+  fi
+)
 
 download_utility() (
   set -euo pipefail
@@ -101,21 +109,52 @@ get_random() (
   LC_ALL=C tr -dc "$1" < /dev/urandom | head -c1 || true
 )
 
+latest_yq() (
+  curl -sSfI https://github.com/mikefarah/yq/releases/latest |
+  awk '$1 == "location:" { gsub(".*/v?", "", $0); print}' |
+  tr -d '\r'
+)
+
 check_yaml() (
+  result=0
+  if ! type -P envsubst > /dev/null; then
+    echo 'ERROR: envsubst utility is required.' >&2
+  fi
+  if ! type -P yq > /dev/null || [ -n "${force_yq:-}" ]; then
+    # attempt to download yq
+    version="$(latest_yq)"
+    os="$(uname | tr 'A-Z' 'a-z')"
+    arch="$(arch)"
+    if [ "$arch" = x86_64 ]; then
+      arch=amd64
+    elif [ "$arch" = aarch64 ]; then
+      arch=arm64
+    fi
+    curl -sSfLo "${TMP_DIR}"/yq "https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}"
+    chmod 755 "${TMP_DIR}"/yq
+    if [ ! "$(yq '.test' <<< 'test: success')" = success ]; then
+      echo 'ERROR: could not download a usable yq.' >&2
+      result=1
+    fi
+  fi
   if [ ! -f "$1" ]; then
     echo "ERROR: $1 does not exist." >&2
-    return 1
+    result=1
   fi
 
   if ! yq . < "$1" > /dev/null; then
     echo "ERROR: $1 must be valid YAML." >&2
-    return 1
+    result=1
   fi
+  return "$result"
 )
 
 if [ "$#" -gt 0 ]; then
   default_yaml="$1"
 fi
+
+export TMP_DIR="$(mktemp -d)"
+trap '[ ! -d "$TMP_DIR" ] || rm -rf "${TMP_DIR}"' EXIT
 
 check_yaml "$default_yaml"
 
