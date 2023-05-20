@@ -1,3 +1,8 @@
+# download-utilities v1.3
+
+- Enhancement: Checksum before downloading.  If the utility already exists and
+  is a valid checksum, then there's no need to download it.
+
 # download-utilities v1.2
 
 - Update release automation to exclude header.

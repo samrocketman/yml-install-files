@@ -55,6 +55,32 @@ download_utility() (
     fi
   fi
   set_debug="set -euxo pipefail;"
+  if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
+    checksum_file="$(
+      eval "$(
+        echo "(${set_debug} echo ${checksum_file}; )" | envsubst
+      )"
+    )"
+    if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
+      if grep -F / > /dev/null <<< "$1"; then
+        checksum_file="${1%/*}/${checksum_file}"
+      fi
+    fi
+    if [ ! -f "${checksum_file}" ]; then
+      echo "ERROR: Checksum file '${checksum_file}' does not exist." >&2
+      return 1
+    fi
+    if grep -F "${dest}/${utility}" "${checksum_file}" | {
+        if type -P shasum > /dev/null; then
+          shasum -a 256 -c -
+        else
+          sha256sum -c -
+        fi
+      }; then
+      return
+    fi
+    # checksum failed
+  fi
   if [ -n "${extension:-}" ]; then
     extension="$(
       eval "$(
@@ -85,29 +111,7 @@ download_utility() (
     )
   fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
-    checksum_file="$(
-      eval "$(
-        echo "(${set_debug} echo ${checksum_file}; )" | envsubst
-      )"
-    )"
-    if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
-      if grep -F / > /dev/null <<< "$1"; then
-        checksum_file="${1%/*}/${checksum_file}"
-      fi
-    fi
-    if [ ! -f "${checksum_file}" ]; then
-      echo "ERROR: Checksum file '${checksum_file}' does not exist." >&2
-      return 1
-    fi
-    set -x
-    grep -F "${dest}/${utility}" "${checksum_file}" | {
-      if type -P shasum > /dev/null; then
-        shasum -a 256 -c -
-      else
-        sha256sum -c -
-      fi
-    }
-    # checksum passed
+    return 2
   fi
   if [ -n "${perm:-}" ]; then
     (
