@@ -11,6 +11,7 @@ set -euo pipefail
 default_yaml="download-utilities.yml"
 
 download_utility() (
+  set -euo pipefail
   download="$(yq -r ".utility.$2.download // \"\"" "$1")"
   if [ -z "${download:-}" ]; then
     echo "SKIP ${2}: no download URL specified." >&2
@@ -43,17 +44,18 @@ download_utility() (
       return
     fi
   fi
+  set_debug="set -euxo pipefail;"
   if [ -n "${extension:-}" ]; then
     extension="$(
       eval "$(
-        echo "( set -x; ${extension}; )" | envsubst
+        echo "(${set_debug} ${extension}; )" | envsubst
       )"
     )"
   fi
   if [ -n "${pre_command:-}" ]; then
     (
       eval "$(
-        echo "(set -x ; ${pre_command}; )" | envsubst
+        echo "(${set_debug} ${pre_command}; )" | envsubst
       )"
     )
   fi
@@ -61,35 +63,35 @@ download_utility() (
     # non-extracting direct download utilities
     (
       eval "$(
-        echo "(set -x ; curl -sSfLo '${dest}/$2' $download;)" | envsubst
+        echo "(${set_debug} curl -sSfLo '${dest}/$2' $download;)" | envsubst
       )"
-    )
+    ) || return 1
   else
     # utilities which require extra scripting and extraction
     (
       eval "$(
-        echo "( set -x; curl -sSfL $download | $extract; )" | envsubst
+        echo "(${set_debug} curl -sSfL $download | $extract; )" | envsubst
       )"
     )
   fi
   if [ -n "${perm:-}" ]; then
     (
       eval "$(
-        echo "(set -x; chmod ${perm} '${dest}/$2';)" | envsubst
+        echo "(${set_debug} chmod ${perm} '${dest}/$2';)" | envsubst
       )"
     )
   fi
   if [ -n "${owner:-}" ]; then
     (
       eval "$(
-        echo "(set -x; chown ${owner} '${dest}/$2';)" | envsubst
+        echo "(${set_debug} chown ${owner} '${dest}/$2';)" | envsubst
       )"
     )
   fi
   if [ -n "${post_command:-}" ]; then
     (
       eval "$(
-        echo "(set -x ; ${post_command}; )" | envsubst
+        echo "(${set_debug} ${post_command}; )" | envsubst
       )"
     )
   fi
@@ -120,5 +122,17 @@ fi
 
 # Download each utility
 yq -r '.utility | keys | .[]' "$default_yaml" | while read -er util; do
-  download_utility "$default_yaml" "$util"
+  limit=5
+  current=0
+  until download_utility "$default_yaml" "$util"; do
+    ((current = current+1))
+    s="$(LC_ALL=C tr -dc '0-9' < /dev/urandom | head -c1 || true)"
+    if [ "$current" -gt "$limit" ]; then
+      echo 'RETRY limit reached.' >&2
+      false
+    fi
+    time=$s
+    echo "Sleeping for $time seconds before retrying." >&2
+    sleep "$time"
+  done
 done
