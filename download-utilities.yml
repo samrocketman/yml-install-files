@@ -6,7 +6,7 @@ versions:
   gimme: master
   goss: 0.3.22
   helm: 3.12.0
-  jq: 1.6
+  jq: "1.6"
   kubectl: 1.27.2
   kubeval: 0.16.1
   kustomize: 5.0.3
