@@ -68,7 +68,7 @@ TMP_DIR="$(mktemp -d)"
 trap '[ -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 touch "$TMP_DIR/versions.yml"
 
-yq -r '.utility | keys | .[]' "$default_yaml" | while read -er util; do
+yq -r '.utility | keys | .[]' "$default_yaml" | (LC_ALL=C sort;) | while read -er util; do
   get_update "$default_yaml" "$util"
 done
 
