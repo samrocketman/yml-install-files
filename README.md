@@ -1,5 +1,15 @@
 # Download files via YAML
 
+### Use case
+
+I created this project to solve the following challenges:
+
+- In docker images, I package common utilities such as `yq`.  I tend to download on different architctures and operating systems.  Handling various download URL formats and processes for different projects can be unique to each project.  Not all utilities are available.
+- Validating the integrity of downloaded utilities is a regular practice.  I wanted to have an easy means of validating downloaded files.
+- Keeping utilities up to date.
+
+### About Project
+
 A flexible bash-based utility meant to install binary utilities downloaded from
 the internet.  Intended for Docker.
 
