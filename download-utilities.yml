@@ -103,7 +103,7 @@ utility:
     download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
     extract: >
       (
-        if [ ${os} = darwin ]; then
+        if [ ${os} = darwin ] && [ ! "$(uname)" = Linux ] ; then
           tar -xzC ${dest}/ --no-same-owner --strip-components=1 '*/helm';
         else
           tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm';
