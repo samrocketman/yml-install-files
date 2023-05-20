@@ -97,6 +97,10 @@ download_utility() (
   fi
 )
 
+get_random() (
+  LC_ALL=C tr -dc "$1" < /dev/urandom | head -c1 || true
+)
+
 check_yaml() (
   if [ ! -f "$1" ]; then
     echo "ERROR: $1 does not exist." >&2
@@ -126,12 +130,11 @@ yq -r '.utility | keys | .[]' "$default_yaml" | while read -er util; do
   current=0
   until download_utility "$default_yaml" "$util"; do
     ((current = current+1))
-    s="$(LC_ALL=C tr -dc '0-9' < /dev/urandom | head -c1 || true)"
     if [ "$current" -gt "$limit" ]; then
       echo 'RETRY limit reached.' >&2
       false
     fi
-    time=$s
+    time="$(get_random '0-1')$(get_random '0-9')"
     echo "Sleeping for $time seconds before retrying." >&2
     sleep "$time"
   done
