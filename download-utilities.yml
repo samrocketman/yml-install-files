@@ -19,6 +19,7 @@ defaults: &defaults
   # dest could be /usr/local/bin in Docker builds
   dest: ./scratch
   perm: '0755'
+  checksum_file: checksums/$(uname)-$(arch).sha256
   # owner: someuser is also available
   # pre_command: shell scripting available
   # post_command: shell scripting available

@@ -86,6 +86,10 @@ sha256sum -c checksums.sha256
 shasum -a 256 -c checksums.sha256
 ```
 
+### Automatic updating
+
+[`checksums`](checksums) directory provides an example of automatic updating.
+
 # Requirements
 
 Only Mac OS and Linux is currently supported.  BSD should work also but isn't
@@ -110,6 +114,7 @@ utility:
   # name of utility downloaded to the dest
   utility_key:
     arch: # translation map from arch value to download file value
+    checksum_file: # a file created by create-utility-checksums.sh script
     dest: /usr/local/bin # destination path to download utility
     downlaod: # a URL to download the utility
     extension: echo tar.gz # optional shell script which should echo the extension
@@ -271,3 +276,43 @@ only: "[ ${arch} = x86_64 ]"
 
 > Note: the value of `${arch}` should be considered after variable translation.
 > This example assumes no translation.
+
+### `checksum_file` shell script
+
+Points to a file created by
+[`create-utility-checksums.sh`](create-utility-checksums.sh) and validates the
+checksum for the individual file contained within.  It is evaluated as an echo
+statement.  However, you can do some more advanced shell scripting if you need
+to.
+
+The shell script generating the checksum file path is the following.
+
+```bash
+echo ${checksum_file}
+```
+
+Basic example:
+
+```yaml
+checksum_file: checksums/$(uname)-$(arch).sha256
+```
+
+The following advanced example where a user can change the echo depending on
+other architecture variables.  You need to discard the initial `echo` by
+redirecting it to `/dev/null`.
+
+```yaml
+checksum_file: >
+  > /dev/null;
+  if [ -n '${emulate_platform}' ]; then
+    echo checksums/${os}-${arch}.sha256
+  else
+    echo checksums/$(uname)-$(arch).sha256
+  fi
+```
+
+In the above example, you could provide the `envsubst` variable manually.
+
+```bash
+emulate_platform=1 ./download-utilities.sh
+```

@@ -44,8 +44,10 @@ download_utility() (
   pre_command="$(yq -r ".utility.$2.pre_command // \"\"" "$1")"
   post_command="$(yq -r ".utility.$2.post_command // \"\"" "$1")"
   extension="$(yq -r ".utility.$2.extension // \"\"" "$1")"
+  checksum_file="$(yq -r ".utility.$2.checksum_file // \"\"" "$1")"
   utility="$2"
-  export arch dest download extension extract only os owner perm post_command pre_command utility version
+  export arch checksum_file dest download extension extract only os owner perm \
+    post_command pre_command utility version
   if [ -n "${only:-}" ]; then
     if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
       echo "SKIP $2: because matching only: $only" >&2
@@ -81,6 +83,26 @@ download_utility() (
         echo "(${set_debug} curl -sSfL $download | $extract; )" | envsubst
       )"
     )
+  fi
+  if [ -n "${checksum_file:-}" ]; then
+    checksum_file="$(
+      eval "$(
+        echo "(${set_debug} echo ${checksum_file}; )" | envsubst
+      )"
+    )"
+    if [ ! -f "${checksum_file}" ]; then
+      echo "ERROR: Checksum file '${checksum_file}' does not exist." >&2
+      return 1
+    fi
+    set -x
+    grep -F "${dest}/${utility}" "${checksum_file}" | {
+      if type -P shasum > /dev/null; then
+        shasum -a 256 -c -
+      else
+        sha256sum -c -
+      fi
+    }
+    # checksum passed
   fi
   if [ -n "${perm:-}" ]; then
     (
@@ -170,13 +192,17 @@ fi
 
 # Download each utility
 yq -r '.utility | keys | .[]' "$default_yaml" | while read -er util; do
-  limit=5
+  limit=6
   current=0
   until download_utility "$default_yaml" "$util"; do
     ((current = current+1))
     if [ "$current" -gt "$limit" ]; then
       echo 'RETRY limit reached.' >&2
       false
+    fi
+    # typically a checksum failure so skip the first sleep
+    if [ "$current" -eq 1 ]; then
+      continue
     fi
     time="$(get_random '0-1')$(get_random '0-9')"
     echo "Sleeping for $time seconds before retrying." >&2
