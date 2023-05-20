@@ -1,3 +1,7 @@
+# download-utilities v1.1
+
+- Bugfix: kustomize missing `os` translation for `darwin`.
+
 # download-utilities v1.0
 
 Initial stable release for downloading utilities:
