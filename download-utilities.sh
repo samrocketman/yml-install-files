@@ -90,6 +90,11 @@ download_utility() (
         echo "(${set_debug} echo ${checksum_file}; )" | envsubst
       )"
     )"
+    if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
+      if grep -F / > /dev/null <<< "$1"; then
+        checksum_file="${1%/*}/${checksum_file}"
+      fi
+    fi
     if [ ! -f "${checksum_file}" ]; then
       echo "ERROR: Checksum file '${checksum_file}' does not exist." >&2
       return 1
