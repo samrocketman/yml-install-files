@@ -117,8 +117,13 @@ latest_yq() (
 
 check_yaml() (
   result=0
+  if ! type -P curl > /dev/null; then
+    echo 'ERROR: curl utility is required.' >&2
+    result=1
+  fi
   if ! type -P envsubst > /dev/null; then
     echo 'ERROR: envsubst utility is required.' >&2
+    result=1
   fi
   if ! type -P yq > /dev/null || [ -n "${force_yq:-}" ]; then
     # attempt to download yq

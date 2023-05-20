@@ -94,8 +94,9 @@ tested.
 Running `download-utilities.sh` requires the following installed software:
 
 - Bash
-- coreutils (BSD or GNU)
 - envsubst
+- coreutils (BSD or GNU)
+- curl
 - yq
 
 # YAML spec
