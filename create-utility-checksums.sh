@@ -7,6 +7,7 @@
 # GNU bash, version 5.1.16(1)-release (x86_64-pc-linux-gnu)
 
 set -euo pipefail
+
 default_yaml="download-utilities.yml"
 
 checksum() {
