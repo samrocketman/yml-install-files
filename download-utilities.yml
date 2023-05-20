@@ -7,6 +7,7 @@ versions:
   goss: 0.3.22
   helm: 3.12.0
   jq: "1.6"
+  kubeconform: 0.6.1
   kubectl: 1.27.2
   kubeval: 0.16.1
   kustomize: 5.0.3
@@ -127,6 +128,20 @@ utility:
     update: >
       curl -sSfI https://github.com/stedolan/jq/releases/latest |
       awk '$1 == "location:" { gsub(".*/jq-", "", $0); print}'
+  kubeconform:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    pre_command: rm -f ${dest}/${utility}
+    download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner kubeconform
+    update: >
+      curl -sSfI https://github.com/yannh/kubeconform/releases/latest |
+      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   kubectl:
     <<: *defaults
     os:
@@ -170,6 +185,7 @@ utility:
     <<: *defaults
     os:
       Linux: linux
+      Darwin: darwin
     arch:
       x86_64: amd64
       aarch64: arm64
