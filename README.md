@@ -1,7 +1,7 @@
 # Download files via YAML
 
-A flexible utility meant to install and validate binary utilities downloaded
-from the internet.  Intended for Docker.
+A flexible YAML-based method of downloading multi-arch utilities with checksum
+validation. Intended for Docker.
 
 - [`download-utilities.sh`](download-utilities.sh) A shell utility which reads
   YAML and acts on downloading the files.  If no YAML is provided, then it will

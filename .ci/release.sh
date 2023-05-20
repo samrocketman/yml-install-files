@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -euo pipefail
+
+[ -d .git ] || {
+  echo 'ERROR: must be in repo root to release.' >&@
+  exit 1
+}
+
+tar -c \
+  *.sh \
+  LICENSE \
+  README.md \
+  checksums/Dockerfile \
+  checksums/README.md \
+  checksums/update.sh \
+  docs \
+  | gzip -9 > universal.tgz
+
+notes() {
+  awk '$0 ~ /^#/ && notes == 1 { exit; }; $0 ~ /^#/ {notes=1;}; notes == 1 {print}' < CHANGELOG.md
+}
+
+if [ "$#" -lt 1 ]; then
+  echo 'Must provide a new git tag release.' >&2
+  exit 1
+fi
+
+if ! notes | head -n1 | grep "v$1\$"; then
+  echo 'ERROR: Release notes not updated for: '"v$1"
+  exit 1
+fi
+
+mkdir scratch
+./download-utilities.sh download-utilities.yml gh
