@@ -10,11 +10,12 @@ set -euo pipefail
 tar -c \
   *.sh \
   LICENSE \
+  CHANGELOG.md \
   README.md \
+  docs \
   checksums/Dockerfile \
   checksums/README.md \
   checksums/update.sh \
-  docs \
   | gzip -9 > universal.tgz
 
 notes() {
