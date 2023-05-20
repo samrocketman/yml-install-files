@@ -92,17 +92,18 @@ versions:
 utility:
   # name of utility downloaded to the dest
   utility_key:
-    dest: /usr/local/bin # destination path to download utility
-    perm: 0755 # optional permission to chmod
-    owner: someuser # option username to chown
-    os: # translation map from uname value to download file value
     arch: # translation map from arch value to download file value
-    extension: echo tar.gz # optional shell script which should echo the extension
-    only: # a conditional shell script which can skip downloading if false
-    pre_command: # optional shell script run before download
+    dest: /usr/local/bin # destination path to download utility
     downlaod: # a URL to download the utility
+    extension: echo tar.gz # optional shell script which should echo the extension
     extract: # pipe the download into this shell script e.g. extraction
+    only: # a conditional shell script which can skip downloading if false
+    os: # translation map from uname value to download file value
+    owner: someuser # option username to chown
+    perm: 0755 # optional permission to chmod
     post_command: # optional shell script run after download, chmod, and chown
+    pre_command: # optional shell script run before download
+    version: # a version number
 ```
 
 ### OS and Architectures
