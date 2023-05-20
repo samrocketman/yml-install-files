@@ -40,7 +40,7 @@ initial testing.
 Create checksums of installed utilities.
 
 ```bash
-./create-utility-checksum.sh > checksums.sha256
+./create-utility-checksums.sh > checksums.sha256
 
 # which you can then validate
 sha256sum -c checksums.sha256
