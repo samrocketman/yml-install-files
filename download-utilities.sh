@@ -95,6 +95,11 @@ download_utility() (
       )"
     )
   fi
+  if [ ! -d "${dest}" ]; then
+    echo "ERROR: '${dest}' must exist as a directory and does not." >&2
+    echo "        Perhaps ${utility} needs a pre_command to create it." >&2
+    return 5
+  fi
   if [ -z "${extract:-}" ]; then
     # non-extracting direct download utilities
     (
@@ -204,6 +209,10 @@ yq -r '.utility | keys | .[]' "$default_yaml" | while read -er util; do
   limit=6
   current=0
   until download_utility "$default_yaml" "$util"; do
+    rcode="$?"
+    if [ "$rcode" = 5 ]; then
+      exit "$rcode"
+    fi
     ((current = current+1))
     if [ "$current" -gt "$limit" ]; then
       echo 'RETRY limit reached.' >&2

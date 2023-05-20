@@ -2,6 +2,9 @@
 
 - Enhancement: Checksum before downloading.  If the utility already exists and
   is a valid checksum, then there's no need to download it.
+- Enhancement: Friendly error message suggesting `pre_command` and clearly
+  notifying the caller the destination directory does not exist for the utility
+  being downloaded.
 
 # download-utilities v1.2
 
