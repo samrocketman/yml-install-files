@@ -44,6 +44,6 @@ git push origin refs/tags/"v$1":refs/tags/"v$1"
 
 ./scratch/gh release create "v$1" --verify-tag \
   --title "download-utilities v$1" \
-  --notes "$(notes)"
+  --notes "$(notes | grep -vF "# download-utilities v$1" )"
 
 ./scratch/gh release upload "v$1" universal.tgz

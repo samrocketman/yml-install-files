@@ -1,3 +1,7 @@
+# download-utilities v1.2
+
+- Update release automation to exclude header.
+
 # download-utilities v1.1
 
 - Bugfix: kustomize missing `os` translation for `darwin`.
