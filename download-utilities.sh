@@ -11,8 +11,8 @@ default_yaml="download-utilities.yml"
 
 
 download_utility() (
-  url="$(yq -r ".utility.$2.download // \"\"" "$1")"
-  if [ -z "${url:-}" ]; then
+  download="$(yq -r ".utility.$2.download // \"\"" "$1")"
+  if [ -z "${download:-}" ]; then
     echo "SKIP ${2}: no download URL specified." >&2
     return
   fi
@@ -36,7 +36,7 @@ download_utility() (
   post_command="$(yq -r ".utility.$2.post_command // \"\"" "$1")"
   extension="$(yq -r ".utility.$2.extension // \"\"" "$1")"
   utility="$2"
-  export arch dest extension extract only os owner perm post_command pre_command url utility version
+  export arch dest download extension extract only os owner perm post_command pre_command utility version
   if [ -n "${only:-}" ]; then
     if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
       echo "SKIP $2: because matching only: $only" >&2
@@ -61,14 +61,14 @@ download_utility() (
     # non-extracting direct download utilities
     (
       eval "$(
-        echo "(set -x ; curl -sSfLo '${dest}/$2' $url;)" | envsubst
+        echo "(set -x ; curl -sSfLo '${dest}/$2' $download;)" | envsubst
       )"
     )
   else
     # utilities which require extra scripting and extraction
     (
       eval "$(
-        echo "( set -x; curl -sSfL $url | $extract; )" | envsubst
+        echo "( set -x; curl -sSfL $download | $extract; )" | envsubst
       )"
     )
   fi
