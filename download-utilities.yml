@@ -101,7 +101,7 @@ utility:
       aarch64: arm64
   jq:
     <<: *defaults
-    only: "[[ ${arch} = x86_64 ]]"
+    only: "[ ${arch} = x86_64 ]"
     os:
       Linux: linux64
       Darwin: osx-amd64
