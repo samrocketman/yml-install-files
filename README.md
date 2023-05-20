@@ -37,6 +37,18 @@ initial testing.
 ./download-utilities.sh download-utilities.yml goss
 ```
 
+Create checksums of installed utilities.
+
+```bash
+./create-utility-checksum.sh > checksums.sha256
+
+# which you can then validate
+sha256sum -c checksums.sha256
+
+# or on BSD/Mac
+shasum -a 256 -c checksums.sha256
+```
+
 # Requirements
 
 Only Mac OS and Linux is currently supported.  BSD should work also but isn't
