@@ -84,7 +84,7 @@ download_utility() (
       )"
     )
   fi
-  if [ -n "${checksum_file:-}" ]; then
+  if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
     checksum_file="$(
       eval "$(
         echo "(${set_debug} echo ${checksum_file}; )" | envsubst

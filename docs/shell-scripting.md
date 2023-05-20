@@ -113,14 +113,22 @@ The shell script generating the checksum file path is the following.
 echo ${checksum_file}
 ```
 
-Basic example:
+If you **do not** wish checksums to be considered and to ignore the
+`checksum_file`, then you can pass the following option into the
+[`download-utilities.sh`](../download-utilities.sh) shell script.
+
+```bash
+skip_checksum=1 ./download-utilities.sh
+```
+
+Basic YAML example:
 
 ```yaml
 checksum_file: checksums/$(uname)-$(arch).sha256
 ```
 
-The following advanced example where a user can change the echo depending on
-other architecture variables.  You need to discard the initial `echo` by
+The following is an advanced example where a user can change the echo depending
+on other [variables](yaml-spec.md).  You need to discard the initial `echo` by
 redirecting it to `/dev/null`.
 
 ```yaml
@@ -138,3 +146,6 @@ In the above example, you could provide the `envsubst` variable manually.
 ```bash
 emulate_platform=1 ./download-utilities.sh
 ```
+
+`emulate_platform` isn't a real option in this project and only exists in the
+`checksum_file` example.  It works because of `envsubst` filtering.
