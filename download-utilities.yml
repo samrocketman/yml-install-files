@@ -41,7 +41,7 @@ utility:
     download: https://github.com/docker/compose/releases/download/v${version}/docker-compose-${os}-${arch}
   dumb-init:
     <<: *defaults
-    only: "[ ${arch} = Linux ]"
+    only: "[ ${os} = Linux ]"
     download: https://github.com/Yelp/dumb-init/releases/download/v${version}/dumb-init_${version}_${arch}
   gh:
     <<: *defaults
