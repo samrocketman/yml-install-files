@@ -17,8 +17,23 @@ this example enables downloading to a local directory to showcase its usage.
 
 ```bash
 mkir scratch
-./download-utilities.sh
 
+# download utilities
+./download-utilities.sh download-utilities.yml
+
+# generate a checksum file
+./create-utility-checksums.sh download-utilities.yml > checksums.sha256sum
+
+# in-place update versions of utilities within YAML
+./update-utilities.sh download-utilities.yml
+```
+
+The YAML file argument is optional if the current working directory has a file
+named `download-utilities.yml`.
+
+### Alternate Downloads
+
+```bash
 # alernately download a specific OS or architecture
 os=Linux  arch=x86_64  ./download-utilities.sh
 os=Linux  arch=aarch64 ./download-utilities.sh
@@ -36,6 +51,12 @@ initial testing.
 # Download only goss utility
 ./download-utilities.sh download-utilities.yml goss
 ```
+
+### Checksum utilities
+
+Checksum files are meant for validating downloads from the internet.  A checksum
+is useful for validating Docker images if no utility versions of changed and you
+want to ensure integrity of all downloaded utilities.
 
 Create checksums of installed utilities.
 
