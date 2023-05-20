@@ -65,7 +65,7 @@ fi
 check_yaml "$default_yaml"
 
 TMP_DIR="$(mktemp -d)"
-trap '[ -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
+trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 touch "$TMP_DIR/versions.yml"
 
 yq -r '.utility | keys | .[]' "$default_yaml" | (LC_ALL=C sort;) | while read -er util; do
@@ -73,7 +73,5 @@ yq -r '.utility | keys | .[]' "$default_yaml" | (LC_ALL=C sort;) | while read -e
 done
 
 # update versions without affecting the script bodies
-if [ -f "$TMP_DIR/versions.yml" ]; then
-  filter_versions < "$default_yaml" > "$TMP_DIR/body.yml"
-  cat "$TMP_DIR/versions.yml" "$TMP_DIR/body.yml" > "$default_yaml"
-fi
+filter_versions < "$default_yaml" > "$TMP_DIR/body.yml"
+cat "$TMP_DIR/versions.yml" "$TMP_DIR/body.yml" > "$default_yaml"
