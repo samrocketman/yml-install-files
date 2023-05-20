@@ -72,7 +72,7 @@ utility:
     post_command: # optional shell script run after download, chmod, and chown
 ```
 
-# OS and Architectures
+### OS and Architectures
 
 You can manually set `os` or `arch`.
 
@@ -82,7 +82,6 @@ You can manually set `os` or `arch`.
 Translating with YAML.
 
 ```yaml
-
 utility:
   utility_key:
     os:
@@ -104,23 +103,24 @@ Any values which do not match the translation are left literal and are not
 translated.  For example, if `arch` returns a different value such as `arm64` or
 `386`, then it will not be translated and be the literal value of `${arch}`.
 
-### Variables
+# Variables
 
 All fields get variables set from the YAML or the OS environment.  The following
 is a list of variables.
 
-- `${utility}`
-- `${os}`
 - `${arch}`
 - `${dest}`
-- `${perm}`
-- `${owner}`
+- `${download}`
 - `${extension}`
+- `${os}`
+- `${owner}`
+- `${perm}`
+- `${utility}`
 
-All logic written in shell scripts with these variables should be written with
-the translated values.
+> **Note:** keep in mind some variables like `os` or `arch` have translation.
+> All shell logic should be written with the final translation values in mind.
 
-### Basic shell scripts
+# Basic shell scripts
 
 Shell scripts may not have any kind of shell variables.  All variables get
 filtered by `envsubst` which means you can't easily set and use shell variables.
@@ -131,10 +131,56 @@ systems.
 Avoid any shell variables than the ones listed in the previous section if
 possible.  All scripts get filetered with `envsubst` before executing.
 
-`pre_command` and `post_command` are executed as normal stand alone scripts
-before or after download.
+### Pre and post command scripts
 
-#### `extension` shell script
+`pre_command` and `post_command` are executed as normal stand alone scripts
+before or after download.  These should be small and will execute before or
+after each download.
+
+### Downloading
+
+The `download` YAML URL gets downloaded with `curl`.  If you do not define any
+extraction command, then the curl command looks like the following.
+
+```bash
+curl -sSfLo ${dest}/${utility} ${download}
+```
+
+### `extract` downloaded archives
+
+If you define `extract` YAML, then the defined shell script should expect the
+downloaded file to `stdin`.  The `extract` script is responsible for ensuring
+the final download or extraction location of the utility ends up in
+`${dest}/${utility}`.
+
+```bash
+curl -sSfL ${url} | ${extract}
+```
+
+Not all file formats have utilities which support reading streams from `stdin`.
+In this case, you can use `cat` to redirect `stdin` to a file.  The following is
+an example supporting `zip` or `tar.gz` based on `${extension}` variable.
+
+```yaml
+extract: >
+  if [ ${extension} = zip ]; then
+    (
+      cat > /tmp/file.zip;
+      unzip -o -j -d ${dest} /tmp/file.zip '*/bin/gh';
+    ) && rm -f /tmp/file.zip || rm -f /tmp/file.zip;
+  else
+    tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh';
+  fi
+```
+
+In the above example, the `stdout` of `curl` is passed to `stdin` of `cat` or
+`tar` depending on matching conditions.
+
+> Note: the above example is a YAML multiline string which results in a single
+> line.  This means you need to write your script as if it were on one line with
+> semicolons and other valid shell syntax.
+
+### `extension` shell script
 
 Should always echo one line and that one line is intended to be a file extension
 for downloading.
@@ -155,11 +201,7 @@ extension: >
   fi
 ```
 
-> Note: the above example is a YAML multiline string which results in a single
-> line.  This means you need to write your script as if it were on one line with
-> semicolons and other valid shell syntax.
-
-#### `only` shell script
+### `only` shell script
 
 The YAML for `only` should just result in a conditional result based on exit
 code.  For example,
