@@ -16,7 +16,7 @@ subdirectory.  Normally, your YAML file would download to `/usr/local/bin` but
 this example enables downloading to a local directory to showcase its usage.
 
 ```bash
-mkir scratch
+mkdir scratch
 
 # download utilities
 ./download-utilities.sh download-utilities.yml
