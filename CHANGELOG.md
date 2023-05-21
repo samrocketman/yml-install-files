@@ -1,3 +1,8 @@
+# download-utilities v1.5
+
+- Add release header to scripts.
+- Checksum update example can force checksums.
+
 # download-utilities v1.4
 
 - Enhancement: Can specify download destination by OS and architecture.

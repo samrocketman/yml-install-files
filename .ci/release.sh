@@ -7,6 +7,18 @@ set -euo pipefail
   exit 1
 }
 
+if ! git diff --quiet --exit-code; then
+  echo 'Cannot release with a dirty workspace.' >&2
+  exit
+fi
+
+if ! (
+    for x in *.sh; do grep "^# download-utilities v$1\$" "${x}"; done
+  ); then
+  echo 'Version not updated in scripts.' >&2
+  exit 1
+fi
+
 tar -c \
   *.sh \
   LICENSE \
