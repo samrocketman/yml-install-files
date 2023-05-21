@@ -40,7 +40,17 @@ read_yaml_arch() (
   "$1"
 )
 
-# $1=file $2=utility $3=field $4=one_of:[none, env_shell, shell]
+# replacement for envsubst to provide a slightly more rubust variable
+# substition
+env_shell() (
+eval "
+cat <<EOF
+$(cat)
+EOF
+"
+)
+
+# $1=file $2=utility $3=field $4=one_of:[none, env, env_shell, shell]
 read_yaml() (
   if [ ! "$#" -eq 4 ]; then
     echo 'BUG: read_yaml function called incorrectly.' >&2
@@ -52,15 +62,18 @@ read_yaml() (
     none)
       read_yaml_arch "$@"
       ;;
+    env)
+      read_yaml_arch "$@" | env_shell
+      ;;
     env_shell)
-      true
+      read_yaml_arch "$@" | env_shell | eval "${default_eval_shell}"
       ;;
     shell)
-      true
+      read_yaml_arch "$@" | eval "${default_eval_shell}"
       ;;
     *)
       echo 'BUG: read_yaml function called incorrectly.' >&2
-      echo 'BUG: read_yaml $4 must be one of: none, env_shell, shell.' >&2
+      echo 'BUG: read_yaml $4 must be one of: none, env, env_shell, shell.' >&2
       echo 'BUG: File a bug report or fix.' >&2
       exit 1
       ;;
@@ -93,7 +106,11 @@ setup_environment() {
   pre_command="$(read_yaml "$@" pre_command none)"
   post_command="$(read_yaml "$@" post_command none)"
   download="$(read_yaml "$@" download none)"
-  export arch checksum_file dest download extension extract only os owner perm \
+  default_download="$(read_yaml "$@" default_download none)"
+  default_download_extract="$(read_yaml "$@" default_download_extract none)"
+  default_eval_shell="$(read_yaml "$@" default_eval_shell none)"
+  export arch checksum_file default_download default_download_extract \
+    default_eval_shell dest download extension extract only os owner perm \
     post_command pre_command utility version
 }
 
@@ -116,11 +133,7 @@ download_utility() (
   fi
   set_debug="set -euxo pipefail;"
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
-    checksum_file="$(
-      eval "$(
-        echo "(${set_debug} echo ${checksum_file}; )" | envsubst
-      )"
-    )"
+    checksum_file="$(read_yaml "$@" checksum_file env)"
     if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
       if grep -F / > /dev/null <<< "$1"; then
         checksum_file="${1%/*}/${checksum_file}"
