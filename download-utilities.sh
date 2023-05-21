@@ -209,13 +209,14 @@ trap '[ ! -d "$TMP_DIR" ] || rm -rf "${TMP_DIR}"' EXIT
 
 check_yaml "$default_yaml"
 
-if [ "$#" -eq 2 ]; then
-  download_utility "$default_yaml" "$2"
-  exit
-fi
-
 # Download each utility
-yq -r '.utility | keys | .[]' "$default_yaml" | while read -er util; do
+(
+  if [ "$#" -eq 2 ]; then
+    echo "$2"
+  else
+    yq -r '.utility | keys | .[]' "$default_yaml"
+  fi
+) | while read -er util; do
   limit=6
   current=0
   until download_utility "$default_yaml" "$util"; do

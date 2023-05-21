@@ -1,6 +1,8 @@
 # download-utilities v1.4
 
 - Enhancement: Can specify download destination by OS and architecture.
+- Bugfix: Downloading single utility has the same checksum and retry behavior as
+  all utilities.
 - Bugfix: Minor return bugfix
 - Update example skips checksum if no updates.
 - Changelog included in releases
