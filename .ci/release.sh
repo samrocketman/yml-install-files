@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+if [ ! "$#" -eq 1 ]; then
+  echo 'Must provide a version number to release. e.g. 1.0' >&2
+  exit 1
+fi
+
 [ -d .git ] || {
   echo 'ERROR: must be in repo root to release.' >&@
   exit 1
