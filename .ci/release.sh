@@ -47,10 +47,8 @@ if ! notes | head -n1 | grep "v$1\$" > /dev/null; then
   exit 1
 fi
 
-if [ ! -x ./scratch/gh ]; then
-  mkdir scratch
-  ./download-utilities.sh download-utilities.yml gh
-fi
+[ -d scratch ] || mkdir scratch
+./download-utilities.sh download-utilities.yml gh
 
 git tag "v$1"
 git push origin refs/tags/"v$1":refs/tags/"v$1"
