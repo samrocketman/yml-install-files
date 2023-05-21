@@ -31,7 +31,52 @@ check_yaml() (
   fi
 )
 
-get_binary() (
+# $1=file $2=utility $3=field
+read_yaml_arch() (
+  byname=".utility.$2.$3"
+  byos=".utility.$2.$3.${os}"
+  byarch=".utility.$2.$3.${os}.${arch}"
+  default_val="$(eval "echo \${${3}:-}")"
+  yq -r \
+    "select(${byarch} | type == \"!!str\")${byarch} // \
+    select(${byos}.default | type == \"!!str\")${byos}.default // \
+    select(${byos} | type == \"!!str\")${byos} // \
+    select(${byname}.default | type == \"!!str\")${byname}.default.${arch} // \
+    select(${byname}.default | type == \"!!str\")${byname}.default // \
+    select(${byname} | type == \"!!str\")${byname} // \
+    \"${default_val:-}\"" \
+  "$1"
+)
+
+# $1=file $2=utility $3=field $4=one_of:[none, env_shell, shell]
+read_yaml() (
+  if [ ! "$#" -eq 4 ]; then
+    echo 'BUG: read_yaml function called incorrectly.' >&2
+    echo 'BUG: read_yaml must have four arguments.' >&2
+    echo 'BUG: File a bug report or fix.' >&2
+    exit 1
+  fi
+  case "$4" in
+    none)
+      read_yaml_arch "$@"
+      ;;
+    env_shell)
+      true
+      ;;
+    shell)
+      true
+      ;;
+    *)
+      echo 'BUG: read_yaml function called incorrectly.' >&2
+      echo 'BUG: read_yaml $4 must be one of: none, env_shell, shell.' >&2
+      echo 'BUG: File a bug report or fix.' >&2
+      exit 1
+      ;;
+  esac
+)
+
+# $1=file $2=utility
+setup_environment() {
   if [ -z "${os:-}" ]; then
     os="$(uname)"
   fi
@@ -39,28 +84,22 @@ get_binary() (
     arch="$(arch)"
   fi
 
-  os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
+  # static variables
   arch="$(yq -r ".utility.$2.arch.${arch} // \"${arch}\"" "$1")"
-  dest="$(
-    bydest=".utility.$2.dest"
-    byos=".utility.$2.dest.${os}"
-    byarch=".utility.$2.dest.${os}.${arch}"
-    yq -r \
-      "select(${bydest} | type == \"!!str\")${bydest} // \
-      select(${byos} | type == \"!!str\")${byos} // \
-      select(${byarch} | type == \"!!str\")${byarch} // \
-      \"${dest:-}\"" \
-    "$1"
-  )"
-  perm="$(yq -r ".utility.$2.perm // \"${perm:-}\"" "$1")"
-  owner="$(yq -r ".utility.$2.owner // \"${owner:-}\"" "$1")"
-  extract="$(yq -r ".utility.$2.extract // \"\"" "$1")"
-  only="$(yq -r ".utility.$2.only // \"\"" "$1")"
-  pre_command="$(yq -r ".utility.$2.pre_command // \"\"" "$1")"
-  post_command="$(yq -r ".utility.$2.post_command // \"\"" "$1")"
-  extension="$(yq -r ".utility.$2.extension // \"\"" "$1")"
+  os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
+  version="$(yq -r ".versions.$2 // .utility.$2.version // \"\"" "$1")"
   utility="$2"
-  export arch dest download extension extract only os owner perm post_command pre_command utility version
+
+  # variables referenced by OS or architecture
+  dest="$(read_yaml "$@" dest none)"
+  only="$(read_yaml "$@" only none)"
+  export arch checksum_file dest download extension extract only os owner perm \
+    post_command pre_command utility version
+}
+
+# $1=file $2=utility
+get_binary() (
+  setup_environment "$@"
   if [ -n "${only:-}" ]; then
     if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
       echo "SKIP $2: because matching only: $only" >&2
