@@ -36,7 +36,8 @@ set -e
 }
 docker build -t update -f checksums/Dockerfile checksums
 update_versions
-if git diff --quiet --exit-code download-utilities.yml; then
+if git diff --quiet --exit-code download-utilities.yml && \
+  [ -z "${checksum:-}" ]; then
   echo 'No updates.' >&2
   exit
 fi
