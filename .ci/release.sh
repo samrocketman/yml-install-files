@@ -12,6 +12,11 @@ fi
   exit 1
 }
 
+if [ ! "$(git rev-parse HEAD)" = "$(git show-ref -s origin/main)" ]; then
+  echo 'ERROR: push to main before releasing.' >&2
+  exit 1
+fi
+
 if ! git diff --quiet --exit-code; then
   echo 'Cannot release with a dirty workspace.' >&2
   exit
