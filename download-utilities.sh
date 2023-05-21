@@ -50,6 +50,10 @@ EOF
 "
 )
 
+eval_shell() (
+  eval "${default_eval_shell}"
+)
+
 # $1=file $2=utility $3=field $4=one_of:[none, env, env_shell, shell]
 read_yaml() (
   if [ ! "$#" -eq 4 ]; then
@@ -66,10 +70,10 @@ read_yaml() (
       read_yaml_arch "$@" | env_shell
       ;;
     env_shell)
-      read_yaml_arch "$@" | env_shell | eval "${default_eval_shell}"
+      read_yaml_arch "$@" | env_shell | eval_shell
       ;;
     shell)
-      read_yaml_arch "$@" | eval "${default_eval_shell}"
+      read_yaml_arch "$@" | eval_shell
       ;;
     *)
       echo 'BUG: read_yaml function called incorrectly.' >&2
@@ -162,33 +166,21 @@ download_utility() (
   fi
   if [ -z "${extract:-}" ]; then
     # non-extracting direct download utilities
-    read_yaml "$@" default_download env_shell || return 1
+    read_yaml "$@" default_download env_shell || return $?
   else
-    read_yaml "$@" default_download_extract env_shell || return 1
+    read_yaml "$@" default_download_extract env_shell || return $?
   fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
     return 1
   fi
   if [ -n "${perm:-}" ]; then
-    (
-      eval "$(
-        echo "(${set_debug} chmod ${perm} '${dest}/$2';)" | envsubst
-      )"
-    )
+    echo "chmod ${perm} '${dest}/$2'" | eval_shell || return $?
   fi
   if [ -n "${owner:-}" ]; then
-    (
-      eval "$(
-        echo "(${set_debug} chown ${owner} '${dest}/$2';)" | envsubst
-      )"
-    )
+      echo "chown ${owner} '${dest}/$2'" | eval_shell || return $?
   fi
   if [ -n "${post_command:-}" ]; then
-    (
-      eval "$(
-        echo "(${set_debug} ${post_command}; )" | envsubst
-      )"
-    )
+    read_yaml "$@" post_command shell || return $?
   fi
 )
 
