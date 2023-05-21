@@ -24,7 +24,6 @@ tested.
 Running `download-utilities.sh` requires the following installed software:
 
 - Bash
-- envsubst
 - coreutils (BSD or GNU)
 - curl
 - yq (auto downloads latest if not available)

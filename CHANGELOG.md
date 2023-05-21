@@ -1,6 +1,11 @@
-# download-utilities v1.6
+# download-utilities v2.0
 
+- Major feature: more advanced shell execution with the ability for user to
+  override.
 - Major feature: All fields can be retrieved by OS or architecture.
+- Enhancement: Remove dependency on `envsubst`.
+- Enhancement: Optionally remove dependency on `curl` in favor of `wget` or
+  another utility which the user provides via YAML.
 - Field behavior change: `extension` is no longer a shell script.  It is
   referenced by OS or architecture and is just a static string.
 - Bugfix: get `${dest}` by `${os}` and `${arch}` is fixed.

@@ -1,19 +1,38 @@
 # Basic shell scripts
 
-Shell scripts may not have any kind of shell variables.  All variables get
-filtered by `envsubst` which means you can't easily set and use shell variables.
-If you intend to support multiple operating systems (like MacOS, Linux, etc);
-then your scripts should be limited to what is available to all operating
-systems.
+All shell scripts are filtered by bash before they're executed.  This is similar
+to `envsubst` but it is more powerful because you have the full power of complex
+substitution in bash.  Because of this you may need to escape local variables if
+you're using them in your script.  The following is an example.
 
-Avoid any shell variables than the ones listed in the previous section if
-possible.  All scripts get filtered with `envsubst` before executing.
+```yaml
+pre_command: >
+  myvar="value";
+  if [ "${os}" = linux ]; then
+    echo "\$myvar"
+  fi
+```
+
+> **Note**: In the above shell script `\$myvar`, the escaped `$` is for the
+> bash variable substituion.  The final script executed will be `$myvar` after
+> substitution.  Any scripted field operates this way if you use local
+> variables.
+
+Because of this, local variables are not recommended due to complexity but they
+are supported via the above string escaping.  Whether a `$` is escaped or not
+will change where it is executed.  For example, `$(uname)` will execute during
+string processing and `\$(uname)` will execute within the context of the
+user-provided script.
+
+Prefer simpler scripts over complex ones for readability.
 
 ### Pre and post command scripts
 
 `pre_command` and `post_command` are executed as normal stand alone scripts
 before or after download.  These should be small and will execute before or
 after each download.
+
+No bash variable substitution occurs beforehand.
 
 ### Downloading
 
@@ -22,6 +41,12 @@ extraction command, then the curl command looks like the following.
 
 ```bash
 curl -sSfLo ${dest}/${utility} ${download}
+```
+
+You can override this in your YAML with:
+
+```yaml
+default_download: "wget -q -O '${dest}/${utility}' ${download}"
 ```
 
 ### `extract` downloaded archives
@@ -33,6 +58,12 @@ the final download or extraction location of the utility ends up in
 
 ```bash
 curl -sSfL ${url} | ${extract}
+```
+
+You can override this with the following YAML.
+
+```yaml
+default_download_extract: "wget -q -O - ${download} | ${extract}"
 ```
 
 Not all file formats have utilities which support reading streams from `stdin`.

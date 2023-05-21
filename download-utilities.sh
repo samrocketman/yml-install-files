@@ -40,8 +40,8 @@ read_yaml_arch() (
   "$1"
 )
 
-# replacement for envsubst to provide a slightly more rubust variable
-# substition
+# Replacement for envsubst to provide a slightly more rubust variable
+# substition via bash.
 env_shell() (
 eval "
 cat <<EOF
@@ -198,10 +198,6 @@ check_yaml() (
   result=0
   if ! type -P curl > /dev/null; then
     echo 'ERROR: curl utility is required.' >&2
-    result=1
-  fi
-  if ! type -P envsubst > /dev/null; then
-    echo 'ERROR: envsubst utility is required.' >&2
     result=1
   fi
   if ! type -P yq > /dev/null || [ -n "${force_yq:-}" ]; then
