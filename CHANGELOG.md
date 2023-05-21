@@ -1,6 +1,7 @@
 # download-utilities v1.4
 
 - Enhancement: Can specify download destination by OS and architecture.
+- Update example skips checksum if no updates.
 - Changelog included in releases
 
 # download-utilities v1.3
