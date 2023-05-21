@@ -12,7 +12,7 @@ utility:
     checksum_file: # a file created by create-utility-checksums.sh script
     dest: /usr/local/bin # destination path to download utility
     downlaod: # a URL to download the utility
-    extension: echo tar.gz # optional shell script which should echo the extension
+    extension: echo tar.gz # optional shell script to echo the extension
     extract: # pipe the download into this shell script e.g. extraction
     only: # a conditional shell script which can skip downloading if false
     os: # translation map from uname value to download file value
@@ -22,6 +22,23 @@ utility:
     pre_command: # optional shell script run before download
     version: # a version number
 ```
+
+### Variables
+
+All fields get variables set from the YAML or the OS environment.  The following
+is a list of variables.
+
+- `${arch}`
+- `${dest}`
+- `${download}`
+- `${extension}`
+- `${os}`
+- `${owner}`
+- `${perm}`
+- `${utility}`
+
+> **Note:** keep in mind some variables like `os` or `arch` have translation.
+> All shell logic should be written with the final translation values in mind.
 
 ### OS and Architectures
 
@@ -54,21 +71,36 @@ Any values which do not match the translation are left literal and are not
 translated.  For example, if `arch` returns a different value such as `arm64` or
 `386`, then it will not be translated and be the literal value of `${arch}`.
 
-### Variables
+### Destination paths
 
-All fields get variables set from the YAML or the OS environment.  The following
-is a list of variables.
+Same destination for all operating systems and architectures.
 
-- `${arch}`
-- `${dest}`
-- `${download}`
-- `${extension}`
-- `${os}`
-- `${owner}`
-- `${perm}`
-- `${utility}`
+```yaml
+utility:
+  utility_key:
+    dest: /usr/local/bin
+```
 
-> **Note:** keep in mind some variables like `os` or `arch` have translation.
-> All shell logic should be written with the final translation values in mind.
+Different destination by OS.
 
+```yaml
+utility:
+  utility_key:
+    dest:
+      Linux: /home/user/bin
+      Darwin: /Users/user/bin
+```
 
+Different destination by OS and architecture.
+
+```yaml
+utility:
+  utility_key:
+    dest:
+      Linux:
+        x86_64: /home/user/bin
+        aarch64: /usr/local/bin
+      Darwin:
+        x86_64: /Users/user/bin
+        arm64: /Users/user/local/bin
+```

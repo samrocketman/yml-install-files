@@ -36,7 +36,17 @@ download_utility() (
 
   os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
   arch="$(yq -r ".utility.$2.arch.${arch} // \"${arch}\"" "$1")"
-  dest="$(yq -r ".utility.$2.dest // \"${dest:-}\"" "$1")"
+  dest="$(
+    bydest=".utility.$2.dest"
+    byos=".utility.$2.dest.${os}"
+    byarch=".utility.$2.dest.${os}"
+    yq -r \
+      "select(${bydest} | type == \"!!str\")${bydest} // \
+      select(${byos} | type == \"!!str\")${byos} // \
+      select(${byarch} | type == \"!!str\")${byarch} // \
+      \"${dest:-}\"" \
+    "$1"
+  )"
   perm="$(yq -r ".utility.$2.perm // \"${perm:-}\"" "$1")"
   owner="$(yq -r ".utility.$2.owner // \"${owner:-}\"" "$1")"
   extract="$(yq -r ".utility.$2.extract // \"\"" "$1")"

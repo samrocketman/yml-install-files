@@ -1,3 +1,8 @@
+# download-utilities v1.4
+
+- Enhancement: Can specify download destination by OS and architecture.
+- Changelog included in releases
+
 # download-utilities v1.3
 
 - Enhancement: Checksum before downloading.  If the utility already exists and
