@@ -44,7 +44,7 @@ get_binary() (
   dest="$(
     bydest=".utility.$2.dest"
     byos=".utility.$2.dest.${os}"
-    byarch=".utility.$2.dest.${os}"
+    byarch=".utility.$2.dest.${os}.${arch}"
     yq -r \
       "select(${bydest} | type == \"!!str\")${bydest} // \
       select(${byos} | type == \"!!str\")${byos} // \

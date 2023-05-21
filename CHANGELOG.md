@@ -1,3 +1,7 @@
+# download-utilities v1.6
+
+- Bugfix: get `${dest}` by `${os}` and `${arch}` is fixed.
+
 # download-utilities v1.5
 
 - Add release header to scripts.
