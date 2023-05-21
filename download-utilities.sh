@@ -123,10 +123,10 @@ download_utility() (
       eval "$(
         echo "(${set_debug} curl -sSfL $download | $extract; )" | envsubst
       )"
-    )
+    ) || return 1
   fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
-    return 2
+    return 1
   fi
   if [ -n "${perm:-}" ]; then
     (
