@@ -116,8 +116,6 @@ setup_environment() {
 
 # $1=file $2=utility
 download_utility() (
-  set -euo pipefail
-
   setup_environment "$@"
 
   if [ -z "${download:-}" ]; then
@@ -155,11 +153,7 @@ download_utility() (
     # checksum failed
   fi
   if [ -n "${pre_command:-}" ]; then
-    (
-      eval "$(
-        echo "(${set_debug} ${pre_command}; )" | envsubst
-      )"
-    )
+    read_yaml "$@" pre_command shell || return $?
   fi
   if [ ! -d "${dest}" ]; then
     echo "ERROR: '${dest}' must exist as a directory and does not." >&2
@@ -168,18 +162,9 @@ download_utility() (
   fi
   if [ -z "${extract:-}" ]; then
     # non-extracting direct download utilities
-    (
-      eval "$(
-        echo "(${set_debug} curl -sSfLo '${dest}/$2' ${download};)" | envsubst
-      )"
-    ) || return 1
+    read_yaml "$@" default_download env_shell || return 1
   else
-    # utilities which require extra scripting and extraction
-    (
-      eval "$(
-        echo "(${set_debug} curl -sSfL $download | $extract; )" | envsubst
-      )"
-    ) || return 1
+    read_yaml "$@" default_download_extract env_shell || return 1
   fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
     return 1
