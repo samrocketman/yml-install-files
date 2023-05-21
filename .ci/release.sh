@@ -24,7 +24,7 @@ fi
 
 if ! (
     for x in *.sh; do grep "^# download-utilities v$1\$" "${x}"; done
-  ); then
+  ) > /dev/null; then
   echo 'Version not updated in scripts.' >&2
   exit 1
 fi
