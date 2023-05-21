@@ -62,12 +62,9 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    extension: >
-      if [ ${os} = macOS ]; then
-        echo zip;
-      else
-        echo tar.gz;
-      fi
+    extension:
+      default: tar.gz
+      macOS: zip
     extract: >
       if [ ${extension} = zip ]; then
         (

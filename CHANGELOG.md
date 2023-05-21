@@ -1,5 +1,8 @@
 # download-utilities v1.6
 
+- Major feature: All fields can be retrieved by OS or architecture.
+- Field behavior change: `extension` is no longer a shell script.  It is
+  referenced by OS or architecture and is just a static string.
 - Bugfix: get `${dest}` by `${os}` and `${arch}` is fixed.
 
 # download-utilities v1.5

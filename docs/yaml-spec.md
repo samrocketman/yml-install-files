@@ -71,9 +71,19 @@ Any values which do not match the translation are left literal and are not
 translated.  For example, if `arch` returns a different value such as `arm64` or
 `386`, then it will not be translated and be the literal value of `${arch}`.
 
-### Destination paths
+### Fields by OS and architecture
 
-Same destination for all operating systems and architectures.
+The following fields are **EXCLUDED** from this section of documentation.
+
+- `arch`
+- `os`
+- `version`
+
+All all other fields can have either a simple YAML String as the value or a
+hierarchy based on OS and architecture.
+
+For example, `dest` field.  Same destination for all operating systems and
+architectures.
 
 ```yaml
 utility:
@@ -81,12 +91,14 @@ utility:
     dest: /usr/local/bin
 ```
 
-Different destination by OS.
+Different destination by OS.  A default for kernels other than `Linux` or
+`Darwin`.
 
 ```yaml
 utility:
   utility_key:
     dest:
+      default: /usr/local/bin
       Linux: /home/user/bin
       Darwin: /Users/user/bin
 ```
@@ -97,10 +109,24 @@ Different destination by OS and architecture.
 utility:
   utility_key:
     dest:
-      Linux:
+      default:
+        default: /usr/local/bin
         x86_64: /home/user/bin
-        aarch64: /usr/local/bin
+      Linux:
+        default: /usr/local/bin
+        x86_64: /home/user/bin
+        aarch64: /home/user/local/bin
       Darwin:
         x86_64: /Users/user/bin
         arm64: /Users/user/local/bin
 ```
+
+More specific key takes precedence.  Here's the precedence order (where
+`${field}` is `dest` or any other valid field).  `yq` will try to read in order.
+
+* `utility_key.${field}.${os}.${arch}`
+* `utility_key.${field}.${os}.default`
+* `utility_key.${field}.${os}`
+* `utility_key.${field}.default.${arch}`
+* `utility_key.${field}.default`
+* `utility_key.${field}`

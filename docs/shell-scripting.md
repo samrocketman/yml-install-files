@@ -58,27 +58,6 @@ In the above example, the `stdout` of `curl` is passed to `stdin` of `cat` or
 > line.  This means you need to write your script as if it were on one line with
 > semicolons and other valid shell syntax.
 
-### `extension` shell script
-
-Should always echo one line and that one line is intended to be a file extension
-for downloading.
-
-```yaml
-extension: echo tar.gz
-```
-
-Because this is a basic shell script you can do some detection and download a
-different extension depending any available variables.
-
-```yaml
-extension: >
-  if [ ${os} = Darwin ]; then
-    echo zip;
-  else
-    echo tar.gz;
-  fi
-```
-
 ### `only` shell script
 
 The YAML for `only` should just result in a conditional result based on exit

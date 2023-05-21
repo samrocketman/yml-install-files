@@ -33,6 +33,7 @@ read_yaml_arch() (
     "select(${byarch} | type == \"!!str\")${byarch} // \
     select(${byos}.default | type == \"!!str\")${byos}.default // \
     select(${byos} | type == \"!!str\")${byos} // \
+    select(${byname}.default | type == \"!!str\")${byname}.default.${arch} // \
     select(${byname}.default | type == \"!!str\")${byname}.default // \
     select(${byname} | type == \"!!str\")${byname} // \
     \"${default_val:-}\"" \
@@ -75,9 +76,13 @@ setup_environment() {
     arch="$(arch)"
   fi
 
-  os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
+  # static variables
   arch="$(yq -r ".utility.$2.arch.${arch} // \"${arch}\"" "$1")"
+  os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
+  version="$(yq -r ".versions.$2 // .utility.$2.version // \"\"" "$1")"
   utility="$2"
+
+  # variables referenced by OS or architecture
   dest="$(read_yaml "$@" dest none)"
   perm="$(read_yaml "$@" perm none)"
   owner="$(read_yaml "$@" owner none)"
@@ -88,7 +93,6 @@ setup_environment() {
   pre_command="$(read_yaml "$@" pre_command none)"
   post_command="$(read_yaml "$@" post_command none)"
   download="$(read_yaml "$@" download none)"
-  version="$(yq -r ".versions.$2 // .utility.$2.version // \"\"" "$1")"
   export arch checksum_file dest download extension extract only os owner perm \
     post_command pre_command utility version
 }
@@ -136,13 +140,6 @@ download_utility() (
       return
     fi
     # checksum failed
-  fi
-  if [ -n "${extension:-}" ]; then
-    extension="$(
-      eval "$(
-        echo "(${set_debug} ${extension}; )" | envsubst
-      )"
-    )"
   fi
   if [ -n "${pre_command:-}" ]; then
     (
