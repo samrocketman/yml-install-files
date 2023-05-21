@@ -10,6 +10,10 @@
 set -euo pipefail
 
 default_yaml="${default_yaml:-download-utilities.yml}"
+default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
+default_download_extract='curl -sSfL ${download} | ${extract}'
+default_eval_shell='/bin/bash -euxo pipefail'
+export default_download default_download_extract default_shell default_yaml
 
 yq() (
   if [ -x "${TMP_DIR:-}"/yq ]; then
@@ -19,15 +23,51 @@ yq() (
   fi
 )
 
-download_utility() (
-  set -euo pipefail
-  download="$(yq -r ".utility.$2.download // \"\"" "$1")"
-  if [ -z "${download:-}" ]; then
-    echo "SKIP ${2}: no download URL specified." >&2
-    return
-  fi
-  version="$(yq -r ".versions.$2 // .utility.$2.version" "$1")"
+# $1=file $2=utility $3=field
+read_yaml_arch() (
+  byname=".utility.$2.$3"
+  byos=".utility.$2.$3.${os}"
+  byarch=".utility.$2.$3.${os}.${arch}"
+  default_val="$(eval "echo \${${3}:-}")"
+  yq -r \
+    "select(${byarch} | type == \"!!str\")${byarch} // \
+    select(${byos}.default | type == \"!!str\")${byos}.default // \
+    select(${byos} | type == \"!!str\")${byos} // \
+    select(${byname}.default | type == \"!!str\")${byname}.default // \
+    select(${byname} | type == \"!!str\")${byname} // \
+    \"${default_val:-}\"" \
+  "$1"
+)
 
+# $1=file $2=utility $3=field $4=one_of:[none, env_shell, shell]
+read_yaml() (
+  if [ ! "$#" -eq 4 ]; then
+    echo 'BUG: read_yaml function called incorrectly.' >&2
+    echo 'BUG: read_yaml must have four arguments.' >&2
+    echo 'BUG: File a bug report or fix.' >&2
+    exit 1
+  fi
+  case "$4" in
+    none)
+      read_yaml_arch "$@"
+      ;;
+    env_shell)
+      true
+      ;;
+    shell)
+      true
+      ;;
+    *)
+      echo 'BUG: read_yaml function called incorrectly.' >&2
+      echo 'BUG: read_yaml $4 must be one of: none, env_shell, shell.' >&2
+      echo 'BUG: File a bug report or fix.' >&2
+      exit 1
+      ;;
+  esac
+)
+
+# $1=file $2=utility
+setup_environment() {
   if [ -z "${os:-}" ]; then
     os="$(uname)"
   fi
@@ -37,28 +77,33 @@ download_utility() (
 
   os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
   arch="$(yq -r ".utility.$2.arch.${arch} // \"${arch}\"" "$1")"
-  dest="$(
-    bydest=".utility.$2.dest"
-    byos=".utility.$2.dest.${os}"
-    byarch=".utility.$2.dest.${os}.${arch}"
-    yq -r \
-      "select(${bydest} | type == \"!!str\")${bydest} // \
-      select(${byos} | type == \"!!str\")${byos} // \
-      select(${byarch} | type == \"!!str\")${byarch} // \
-      \"${dest:-}\"" \
-    "$1"
-  )"
-  perm="$(yq -r ".utility.$2.perm // \"${perm:-}\"" "$1")"
-  owner="$(yq -r ".utility.$2.owner // \"${owner:-}\"" "$1")"
-  extract="$(yq -r ".utility.$2.extract // \"\"" "$1")"
-  only="$(yq -r ".utility.$2.only // \"\"" "$1")"
-  pre_command="$(yq -r ".utility.$2.pre_command // \"\"" "$1")"
-  post_command="$(yq -r ".utility.$2.post_command // \"\"" "$1")"
-  extension="$(yq -r ".utility.$2.extension // \"\"" "$1")"
-  checksum_file="$(yq -r ".utility.$2.checksum_file // \"\"" "$1")"
   utility="$2"
+  dest="$(read_yaml "$@" dest none)"
+  perm="$(read_yaml "$@" perm none)"
+  owner="$(read_yaml "$@" owner none)"
+  checksum_file="$(read_yaml "$@" checksum_file none)"
+  extension="$(read_yaml "$@" extension none)"
+  extract="$(read_yaml "$@" extract none)"
+  only="$(read_yaml "$@" only none)"
+  pre_command="$(read_yaml "$@" pre_command none)"
+  post_command="$(read_yaml "$@" post_command none)"
+  download="$(read_yaml "$@" download none)"
+  version="$(yq -r ".versions.$2 // .utility.$2.version // \"\"" "$1")"
   export arch checksum_file dest download extension extract only os owner perm \
     post_command pre_command utility version
+}
+
+# $1=file $2=utility
+download_utility() (
+  set -euo pipefail
+
+  setup_environment "$@"
+
+  if [ -z "${download:-}" ]; then
+    echo "SKIP ${2}: no download URL specified." >&2
+    return
+  fi
+
   if [ -n "${only:-}" ]; then
     if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
       echo "SKIP $2: because matching only: $only" >&2
@@ -115,7 +160,7 @@ download_utility() (
     # non-extracting direct download utilities
     (
       eval "$(
-        echo "(${set_debug} curl -sSfLo '${dest}/$2' $download;)" | envsubst
+        echo "(${set_debug} curl -sSfLo '${dest}/$2' ${download};)" | envsubst
       )"
     ) || return 1
   else
