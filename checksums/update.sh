@@ -7,11 +7,13 @@ update_versions() (
     -e os="$1" \
     -e arch="$2" \
     -e skip_checksum=1 \
+    -e default_download=$'wget -q -O \'${dest}/${utility}\' ${download}' \
+    -e default_download_extract='wget -q -O - ${download} | ${extract}' \
+    -e default_download_head=$'wget -S --spider -o - ${download} 2>&1 | sed \'s/^ *//\' | tr \'A-Z\' \'a-z\'' \
     -u "$(id -u):$(id -g)" \
     -w "$PWD" \
     -v "$PWD:$PWD" update /bin/bash -c \
     './update-utilities.sh'
-
 )
 
 update_arch() (

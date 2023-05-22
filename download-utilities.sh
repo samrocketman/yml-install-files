@@ -10,10 +10,20 @@
 set -euo pipefail
 
 default_yaml="${default_yaml:-download-utilities.yml}"
-default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
-default_download_extract='curl -sSfL ${download} | ${extract}'
-default_eval_shell='/bin/bash -euxo pipefail'
-export default_download default_download_extract default_shell default_yaml
+if [ -z "${default_download:-}" ]; then
+  default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
+fi
+if [ -z "${default_download_extract:-}" ]; then
+  default_download_extract='curl -sSfL ${download} | ${extract}'
+fi
+if [ -z "${default_eval_shell:-}" ]; then
+  default_eval_shell='/bin/bash -euxo pipefail'
+fi
+if [ -z "${default_download_head:-}" ]; then
+  default_download_head='curl -sSfI ${download}'
+fi
+export default_download default_download_extract \
+  default_download_head default_shell default_yaml
 
 yq() (
   if [ -x "${TMP_DIR:-}"/yq ]; then
@@ -40,8 +50,7 @@ read_yaml_arch() (
   "$1"
 )
 
-# Replacement for envsubst to provide a slightly more rubust variable
-# substition via bash.
+# Replacement for envsubst; substitution via bash
 env_shell() (
 eval "
 cat <<EOF
@@ -189,9 +198,37 @@ get_random() (
 )
 
 latest_yq() (
-  curl -sSfI https://github.com/mikefarah/yq/releases/latest |
+  if [ -n "${yq_version:-}" ]; then
+    echo "${yq_version}"
+    return
+  fi
+  download=https://github.com/mikefarah/yq/releases/latest
+  export download
+  echo "$default_download_head" | eval_shell |
   awk '$1 == "location:" { gsub(".*/v?", "", $0); print}' |
   tr -d '\r'
+)
+
+download_temp_yq() (
+  # attempt to download yq
+  version="$(latest_yq)"
+  os="$(uname | tr 'A-Z' 'a-z')"
+  arch="$(arch)"
+  if [ "$arch" = x86_64 ]; then
+    arch=amd64
+  elif [ "$arch" = aarch64 ]; then
+    arch=arm64
+  fi
+  (
+    dest="${TMP_DIR}"
+    utility=yq
+    download="${yq_mirror:-https://github.com}/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}"
+    echo "$default_download" | env_shell | eval_shell || return $?
+  )
+  chmod 755 "${TMP_DIR}"/yq
+  if [ ! "$(yq '.test' <<< 'test: success')" = success ]; then
+    return 1
+  fi
 )
 
 check_yaml() (
@@ -201,18 +238,7 @@ check_yaml() (
     result=1
   fi
   if ! type -P yq > /dev/null || [ -n "${force_yq:-}" ]; then
-    # attempt to download yq
-    version="$(latest_yq)"
-    os="$(uname | tr 'A-Z' 'a-z')"
-    arch="$(arch)"
-    if [ "$arch" = x86_64 ]; then
-      arch=amd64
-    elif [ "$arch" = aarch64 ]; then
-      arch=arm64
-    fi
-    curl -sSfLo "${TMP_DIR}"/yq "https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}"
-    chmod 755 "${TMP_DIR}"/yq
-    if [ ! "$(yq '.test' <<< 'test: success')" = success ]; then
+    if ! download_temp_yq; then
       echo 'ERROR: could not download a usable yq.' >&2
       result=1
     fi
@@ -234,7 +260,7 @@ if [ "$#" -gt 0 ]; then
 fi
 
 export TMP_DIR="$(mktemp -d)"
-trap '[ ! -d "$TMP_DIR" ] || rm -rf "${TMP_DIR}"' EXIT
+trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
 check_yaml "$default_yaml"
 
