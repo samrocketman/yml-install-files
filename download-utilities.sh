@@ -10,6 +10,8 @@
 set -euo pipefail
 
 default_yaml="${default_yaml:-download-utilities.yml}"
+yq_mirror="${yq_mirror:-https://github.com}"
+yq_version="${yq_version:-}"
 if [ -z "${default_download:-}" ]; then
   default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
 fi
@@ -22,8 +24,8 @@ fi
 if [ -z "${default_download_head:-}" ]; then
   default_download_head='curl -sSfI ${download}'
 fi
-export default_download default_download_extract \
-  default_download_head default_shell default_yaml
+export default_download default_download_extract default_download_head \
+  default_eval_shell default_yaml yq_mirror yq_version
 
 yq() (
   if [ -x "${TMP_DIR:-}"/yq ]; then
@@ -270,7 +272,7 @@ download_temp_yq() (
   (
     dest="${TMP_DIR}"
     utility=yq
-    download="${yq_mirror:-https://github.com}/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}"
+    download="${yq_mirror}/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}"
     echo "$default_download" | env_shell | eval_shell || return $?
   )
   chmod 755 "${TMP_DIR}"/yq
