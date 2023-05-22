@@ -50,7 +50,8 @@ read_yaml_arch() (
   byname=".utility.$2.$3"
   byos=".utility.$2.$3.${os}"
   byarch=".utility.$2.$3.${os}.${arch}"
-  if [ "$4" = none ]; then
+  if [ "$4" = none ] ||
+    grep '^default_' <<< "$3" > /dev/null; then
     eval "default_val=\"\${${3}:-}\""
   fi
   yq -r \

@@ -115,22 +115,22 @@ utility:
     download: https://github.com/goss-org/goss/releases/download/v${version}/goss-${os}-${arch}
   helm:
     <<: *defaults
-    pre_command: rm -f ${dest}/${utility}
-    download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
-    extract: >
-      (
-        if [ ${os} = darwin ] && [ ! "$(uname)" = Linux ] ; then
-          tar -xzC ${dest}/ --no-same-owner --strip-components=1 '*/helm';
-        else
-          tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm';
-        fi;
-      )
     os:
       Linux: linux
       Darwin: darwin
     arch:
       x86_64: amd64
       aarch64: arm64
+    pre_command:
+      default:
+      darwin: rm -f ${dest}/${utility}
+    download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
+    extract: |
+      if [ ${os} = darwin ] && [ ! "$(uname)" = Linux ]; then
+        tar -xzC ${dest}/ --no-same-owner --strip-components=1 '*/helm'
+      else
+        tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm'
+      fi
   jq:
     <<: *defaults
     only: "[ ${arch} = x86_64 ]"
