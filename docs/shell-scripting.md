@@ -1,5 +1,20 @@
 # Basic shell scripts
 
+All fields that support shell scripting or substitution are read into the
+following default shell via `stdin`.
+
+```bash
+/bin/bash -eux
+```
+
+If you wish to change the default you can either set the `${default_eval_shell}`
+environment variable or you can override it via YAML.
+
+```yaml
+# less verbose
+default_eval_shell: /bin/bash -eu
+```
+
 The following fields support shell scripting as its value:
 
 - `extract`
@@ -56,6 +71,59 @@ available to bash.  For example,
 ```yaml
 checksum_file: checksums/$(uname)-$(arch).sha256
 ```
+
+### `checksum_file` shell script
+
+Points to a file created by the following command.
+
+    ./download-utilities.sh --checksum
+
+It validates the checksum for the individual file contained within.  It is
+evaluated as an echo statement.  However, you can do some more advanced shell
+scripting if you need to.
+
+The shell script generating the checksum file path is the following.
+
+```bash
+echo ${checksum_file}
+```
+
+If you **do not** wish checksums to be considered and to ignore the
+`checksum_file`, then you can pass the following option into the
+[`download-utilities.sh`](../download-utilities.sh) shell script.
+
+```bash
+skip_checksum=1 ./download-utilities.sh
+```
+
+Basic YAML example:
+
+```yaml
+checksum_file: checksums/$(uname)-$(arch).sha256
+```
+
+The following is an advanced example where a user can change the echo depending
+on other [variables](yaml-spec.md).  You need to discard the initial `echo` by
+redirecting it to `/dev/null`.
+
+```yaml
+checksum_file: >
+  > /dev/null;
+  if [ -n '${emulate_platform}' ]; then
+    echo checksums/${os}-${arch}.sha256
+  else
+    echo checksums/$(uname)-$(arch).sha256
+  fi
+```
+
+In the above example, you could provide the `envsubst` variable manually.
+
+```bash
+emulate_platform=1 ./download-utilities.sh
+```
+
+`emulate_platform` isn't a real option in this project and only exists in the
+`checksum_file` example.  It works because of `envsubst` filtering.
 
 ### `extract` downloaded archives
 
@@ -116,56 +184,3 @@ only: "[ ${arch} = x86_64 ]"
 
 > Note: the value of `${arch}` should be considered after variable translation.
 > This example assumes no translation.
-
-### `checksum_file` shell script
-
-Points to a file created by the following command.
-
-    ./download-utilities.sh --checksum
-
-It validates the checksum for the individual file contained within.  It is
-evaluated as an echo statement.  However, you can do some more advanced shell
-scripting if you need to.
-
-The shell script generating the checksum file path is the following.
-
-```bash
-echo ${checksum_file}
-```
-
-If you **do not** wish checksums to be considered and to ignore the
-`checksum_file`, then you can pass the following option into the
-[`download-utilities.sh`](../download-utilities.sh) shell script.
-
-```bash
-skip_checksum=1 ./download-utilities.sh
-```
-
-Basic YAML example:
-
-```yaml
-checksum_file: checksums/$(uname)-$(arch).sha256
-```
-
-The following is an advanced example where a user can change the echo depending
-on other [variables](yaml-spec.md).  You need to discard the initial `echo` by
-redirecting it to `/dev/null`.
-
-```yaml
-checksum_file: >
-  > /dev/null;
-  if [ -n '${emulate_platform}' ]; then
-    echo checksums/${os}-${arch}.sha256
-  else
-    echo checksums/$(uname)-$(arch).sha256
-  fi
-```
-
-In the above example, you could provide the `envsubst` variable manually.
-
-```bash
-emulate_platform=1 ./download-utilities.sh
-```
-
-`emulate_platform` isn't a real option in this project and only exists in the
-`checksum_file` example.  It works because of `envsubst` filtering.

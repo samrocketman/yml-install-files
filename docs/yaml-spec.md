@@ -10,6 +10,9 @@ utility:
   utility_key:
     arch: # translation map from arch value to download file value
     checksum_file: # a file created by './download-utilities.sh --checksum'
+    default_download: # change script for downloading; see shell script docs
+    default_download_extract: # change script for downloading; see shell script docs
+    default_eval_shell: # change default eval shell; scripts are read from stdin
     dest: /usr/local/bin # destination path to download utility
     downlaod: # a URL to download the utility
     extension: echo tar.gz # optional shell script to echo the extension
@@ -20,6 +23,7 @@ utility:
     perm: 0755 # optional permission to chmod
     post_command: # optional shell script run after download, chmod, and chown
     pre_command: # optional shell script run before download
+    update: # utility script which prints latest version to stdout
     version: # a version number
 ```
 
@@ -40,7 +44,7 @@ is a list of variables.
 > **Note:** keep in mind some variables like `os` or `arch` have translation.
 > All shell logic should be written with the final translation values in mind.
 
-### OS and Architectures
+### OS and architectures
 
 You can manually set `os` or `arch`.
 
