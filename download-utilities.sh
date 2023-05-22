@@ -255,41 +255,93 @@ check_yaml() (
   return "$result"
 )
 
-if [ "$#" -gt 0 ]; then
-  default_yaml="$1"
-fi
+help() {
+cat <<'EOF'
+download-utilities.sh [--download] [download-utilities.yml [utility]]
+
+Example usage:
+  Download utilities
+      download-utilities.sh
+
+  Download a single utility (in this example the yq utility)
+      download-utilities.sh download-utilities.yml yq
+
+Optional Commands:
+  --download
+      Downloads utilities from provided YAML.
+
+  --checksum
+      Creates a sha256 checksum of all files assuming already downloaded.
+
+  --update
+      Updates the version of all utilities.
+EOF
+  exit 1
+}
+
+download_command() {
+  (
+    if [ -n "${2:-}" ]; then
+      echo "$2"
+    else
+      yq -r '.utility | keys | .[]' "$1"
+    fi
+  ) | while read -er util; do
+    limit=6
+    current=0
+    until download_utility "$1" "$util"; do
+      rcode="$?"
+      if [ "$rcode" = 5 ]; then
+        exit "$rcode"
+      fi
+      ((current = current+1))
+      if [ "$current" -gt "$limit" ]; then
+        echo 'RETRY limit reached.' >&2
+        false
+      fi
+      # typically a checksum failure so skip the first sleep
+      if [ "$current" -eq 1 ]; then
+        continue
+      fi
+      time="$(get_random '0-1')$(get_random '0-9')"
+      echo "Sleeping for $time seconds before retrying." >&2
+      sleep "$time"
+    done
+  done
+}
+
+process_args() {
+  desired_command=download
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --download|--checksum|--update)
+        desired_command="${1#--}"
+        shift
+        ;;
+      --help|-h)
+        help
+        ;;
+      *)
+        if [ -f "$1" ]; then
+          default_yaml="$1"
+          shift
+        else
+          subcommand="$1"
+          shift
+        fi
+        ;;
+    esac
+  done
+}
+
+process_args "$@"
 
 export TMP_DIR="$(mktemp -d)"
 trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
 check_yaml "$default_yaml"
 
-# Download each utility
-(
-  if [ "$#" -eq 2 ]; then
-    echo "$2"
-  else
-    yq -r '.utility | keys | .[]' "$default_yaml"
-  fi
-) | while read -er util; do
-  limit=6
-  current=0
-  until download_utility "$default_yaml" "$util"; do
-    rcode="$?"
-    if [ "$rcode" = 5 ]; then
-      exit "$rcode"
-    fi
-    ((current = current+1))
-    if [ "$current" -gt "$limit" ]; then
-      echo 'RETRY limit reached.' >&2
-      false
-    fi
-    # typically a checksum failure so skip the first sleep
-    if [ "$current" -eq 1 ]; then
-      continue
-    fi
-    time="$(get_random '0-1')$(get_random '0-9')"
-    echo "Sleeping for $time seconds before retrying." >&2
-    sleep "$time"
-  done
-done
+case "${desired_command}" in
+  download)
+    download_command "$default_yaml" "${subcommand:-}"
+esac
