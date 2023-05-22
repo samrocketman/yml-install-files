@@ -33,6 +33,18 @@ yq() (
   fi
 )
 
+# $1=file $2=utility
+get_binary() (
+  setup_environment "$@"
+  if [ -n "${only:-}" ]; then
+    if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
+      echo "SKIP $2: because matching only: $only" >&2
+      return
+    fi
+  fi
+  echo "${dest}/${utility}"
+)
+
 # $1=file $2=utility $3=field
 read_yaml_arch() (
   byname=".utility.$2.$3"
@@ -255,6 +267,14 @@ check_yaml() (
   return "$result"
 )
 
+checksum() {
+  if type -P shasum > /dev/null; then
+    xargs shasum -a 256
+  else
+    xargs sha256sum
+  fi
+}
+
 help() {
 cat <<'EOF'
 download-utilities.sh [--download] [download-utilities.yml [utility]]
@@ -310,6 +330,18 @@ download_command() {
   done
 }
 
+checksum_command() {
+  (
+    if [ -n "${2:-}" ]; then
+      echo "$2"
+    else
+      yq -r '.utility | keys | .[]' "$1"
+    fi
+  ) | while read -er util; do
+    get_binary "$default_yaml" "$util"
+  done | checksum
+}
+
 process_args() {
   desired_command=download
   while [ $# -gt 0 ]; do
@@ -344,4 +376,8 @@ check_yaml "$default_yaml"
 case "${desired_command}" in
   download)
     download_command "$default_yaml" "${subcommand:-}"
+    ;;
+  checksum)
+    checksum_command "$default_yaml" "${subcommand:-}"
+    ;;
 esac
