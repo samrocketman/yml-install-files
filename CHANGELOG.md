@@ -1,14 +1,28 @@
 # download-utilities v2.0
 
+Breaking changes:
+
+- `extension` is no longer a shell script.  It is referenced by OS or
+  architecture and is just a static string.  This is due to new flexibility of
+  referencing fields by OS and architecture.
+
+Major changes:
+
 - Large refactor into a single script.
-- Major feature: more advanced shell execution with the ability for user to
-  override.
-- Major feature: All fields can be retrieved by OS or architecture.
-- Enhancement: Remove dependency on `envsubst`.
-- Enhancement: Optionally remove dependency on `curl` in favor of `wget` or
-  another utility which the user provides via YAML.
-- Field behavior change: `extension` is no longer a shell script.  It is
-  referenced by OS or architecture and is just a static string.
+- More advanced shell execution with the ability for user to override.
+- All fields can be retrieved by OS or architecture.  Including shell scripting
+  fields.
+- `update` is more advanced.  Feature parity across all fields and shell
+  scripting fields.
+- If user provides options, remove dependency on `curl` in favor of `wget` or
+  another utility.
+- `yq` self bootstraps if it is missing.  Environment variables set before
+  calling `download-utilities.sh` can change its behavior.
+- Some new defaults can be changed via environment variable.
+
+Minor changes:
+
+- Remove dependency on `envsubst`.
 - Bugfix: get `${dest}` by `${os}` and `${arch}` is fixed.
 
 # download-utilities v1.5
