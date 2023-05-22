@@ -14,7 +14,7 @@ mkdir scratch
 ./download-utilities.sh --checksum download-utilities.yml > checksums.sha256sum
 
 # in-place update versions of utilities within YAML
-./update-utilities.sh download-utilities.yml
+./download-utilities.sh --update download-utilities.yml
 ```
 
 The YAML file argument is optional if the current working directory has a file
