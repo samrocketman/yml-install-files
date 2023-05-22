@@ -37,7 +37,7 @@ yq() (
 get_binary() (
   setup_environment "$@"
   if [ -n "${only:-}" ]; then
-    if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
+    if ! read_yaml "$@" only shell; then
       echo "SKIP $2: because matching only: $only" >&2
       return
     fi
@@ -152,7 +152,7 @@ download_utility() (
   fi
 
   if [ -n "${only:-}" ]; then
-    if ! ( eval "$(echo "(set -x; ${only};)")"; ); then
+    if ! read_yaml "$@" only shell; then
       echo "SKIP $2: because matching only: $only" >&2
       return
     fi
