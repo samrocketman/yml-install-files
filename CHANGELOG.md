@@ -1,5 +1,6 @@
 # download-utilities v2.0
 
+- Large refactor into a single script.
 - Major feature: more advanced shell execution with the ability for user to
   override.
 - Major feature: All fields can be retrieved by OS or architecture.
