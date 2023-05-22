@@ -1,0 +1,30 @@
+utility:
+  gh:
+    version: 2.29.0
+    download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
+    dest: ./scratch
+    perm: '0755'
+    checksum_file: ../../checksums/$(uname)-$(arch).sha256
+    os:
+      Linux: linux
+      Darwin: macOS
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    extension:
+      default: tar.gz
+      macOS: zip
+    default_download_extract: |
+      trap '[ ! -f /tmp/file.zip ] || rm -f /tmp/file.zip' EXIT
+      curl -sSfL ${download} | ${extract}
+    extract:
+      macOS: |
+        {
+          cat > /tmp/file.zip
+          unzip -o -j -d ${dest} /tmp/file.zip '*/bin/gh'
+        }
+      linux:
+        tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh'
+    update: |
+      curl -sSfI https://github.com/cli/cli/releases/latest |
+      awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'
