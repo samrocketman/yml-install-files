@@ -50,7 +50,7 @@ read_yaml_arch() (
   byname=".utility.$2.$3"
   byos=".utility.$2.$3.${os}"
   byarch=".utility.$2.$3.${os}.${arch}"
-  default_val="$(eval "echo \${${3}:-}")"
+  eval "default_val=\"\${${3}:-}\""
   yq -r \
     "select(${byarch} | type == \"!!str\")${byarch} // \
     select(${byos}.default | type == \"!!str\")${byos}.default // \
@@ -91,10 +91,10 @@ read_yaml() (
       read_yaml_arch "$@" | env_shell
       ;;
     env_shell)
-      read_yaml_arch "$@" | env_shell | eval_shell
+      echo "$(read_yaml_arch "$@")" | env_shell | eval_shell
       ;;
     shell)
-      read_yaml_arch "$@" | eval_shell
+      echo "$(read_yaml_arch "$@")" | eval_shell
       ;;
     *)
       echo 'BUG: read_yaml function called incorrectly.' >&2
@@ -121,22 +121,23 @@ setup_environment() {
   utility="$2"
 
   # variables referenced by OS or architecture
-  dest="$(read_yaml "$@" dest none)"
-  perm="$(read_yaml "$@" perm none)"
-  owner="$(read_yaml "$@" owner none)"
   checksum_file="$(read_yaml "$@" checksum_file none)"
-  extension="$(read_yaml "$@" extension none)"
-  extract="$(read_yaml "$@" extract none)"
-  only="$(read_yaml "$@" only none)"
-  pre_command="$(read_yaml "$@" pre_command none)"
-  post_command="$(read_yaml "$@" post_command none)"
-  download="$(read_yaml "$@" download none)"
   default_download="$(read_yaml "$@" default_download none)"
   default_download_extract="$(read_yaml "$@" default_download_extract none)"
   default_eval_shell="$(read_yaml "$@" default_eval_shell none)"
+  dest="$(read_yaml "$@" dest none)"
+  download="$(read_yaml "$@" download none)"
+  extension="$(read_yaml "$@" extension none)"
+  extract="$(read_yaml "$@" extract none)"
+  only="$(read_yaml "$@" only none)"
+  owner="$(read_yaml "$@" owner none)"
+  perm="$(read_yaml "$@" perm none)"
+  post_command="$(read_yaml "$@" post_command none)"
+  pre_command="$(read_yaml "$@" pre_command none)"
+  update="$(read_yaml "$@" update none)"
   export arch checksum_file default_download default_download_extract \
     default_eval_shell dest download extension extract only os owner perm \
-    post_command pre_command utility version
+    post_command pre_command update utility version
 }
 
 # $1=file $2=utility
@@ -204,6 +205,38 @@ download_utility() (
     read_yaml "$@" post_command shell || return $?
   fi
 )
+
+# $1=file $2=utility
+get_update() (
+  setup_environment "$@"
+  if [ -z "${update:-}" ]; then
+    echo "SKIP ${2}: no update script." >&2
+    yq e -i ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
+    return
+  fi
+  new_version="$(read_yaml "$@" update shell | tr -d '\r')" || return $?
+  yq e -i ".versions.$2 |= \"${new_version}\"" "$TMP_DIR/versions.yml"
+)
+
+filter_versions() (
+  awk '
+    BEGIN {
+      skipver=0;
+    };
+    $0 ~ /^versions:/ {
+      skipver=1;
+      next;
+    };
+    skipver == 1 && $0 ~ /^  [^ ]/ {
+      next;
+    };
+    {
+      skipver=0;
+      print;
+    }
+  '
+)
+
 
 get_random() (
   LC_ALL=C tr -dc "$1" < /dev/urandom | head -c1 || true
@@ -342,25 +375,6 @@ checksum_command() {
   done | checksum
 }
 
-filter_versions() (
-  awk '
-    BEGIN {
-      skipver=0;
-    };
-    $0 ~ /^versions:/ {
-      skipver=1;
-      next;
-    };
-    skipver == 1 && $0 ~ /^  [^ ]/ {
-      next;
-    };
-    {
-      skipver=0;
-      print;
-    }
-  '
-)
-
 update_command() {
   touch "$TMP_DIR/versions.yml"
 
@@ -404,23 +418,6 @@ export TMP_DIR="$(mktemp -d)"
 trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
 check_yaml "$default_yaml"
-
-get_update() (
-  update_script="$(yq -r ".utility.$2.update // \"\"" "$1")"
-  version="$(yq -r ".versions.$2 // .utility.$2.version" "$1")"
-  if [ -z "${update_script:-}" ]; then
-    echo "SKIP ${2}: no update script." >&2
-    yq e -i ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
-    return
-  fi
-  debug_update="$(yq -r ".utility.$2.debug_update // \"false\"" "$1")"
-  if [ "${debug_update:-}" = true ]; then
-    new_version="$(eval "set -x; ${update_script}" | tr -d '\r')"
-  else
-    new_version="$(eval "${update_script}" | tr -d '\r')"
-  fi
-  yq e -i ".versions.$2 |= \"${new_version}\"" "$TMP_DIR/versions.yml"
-)
 
 case "${desired_command}" in
   checksum)
