@@ -342,6 +342,38 @@ checksum_command() {
   done | checksum
 }
 
+filter_versions() (
+  awk '
+    BEGIN {
+      skipver=0;
+    };
+    $0 ~ /^versions:/ {
+      skipver=1;
+      next;
+    };
+    skipver == 1 && $0 ~ /^  [^ ]/ {
+      next;
+    };
+    {
+      skipver=0;
+      print;
+    }
+  '
+)
+
+update_command() {
+  touch "$TMP_DIR/versions.yml"
+
+  yq -r '.utility | keys | .[]' "$1" | (LC_ALL=C sort;) | \
+  while read -er util; do
+    get_update "$1" "$util"
+  done
+
+  # update versions without affecting the script bodies
+  filter_versions < "$1" > "$TMP_DIR/body.yml"
+  cat "$TMP_DIR/versions.yml" "$TMP_DIR/body.yml" > "$1"
+}
+
 process_args() {
   desired_command=download
   while [ $# -gt 0 ]; do
@@ -373,11 +405,31 @@ trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
 check_yaml "$default_yaml"
 
+get_update() (
+  update_script="$(yq -r ".utility.$2.update // \"\"" "$1")"
+  version="$(yq -r ".versions.$2 // .utility.$2.version" "$1")"
+  if [ -z "${update_script:-}" ]; then
+    echo "SKIP ${2}: no update script." >&2
+    yq e -i ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
+    return
+  fi
+  debug_update="$(yq -r ".utility.$2.debug_update // \"false\"" "$1")"
+  if [ "${debug_update:-}" = true ]; then
+    new_version="$(eval "set -x; ${update_script}" | tr -d '\r')"
+  else
+    new_version="$(eval "${update_script}" | tr -d '\r')"
+  fi
+  yq e -i ".versions.$2 |= \"${new_version}\"" "$TMP_DIR/versions.yml"
+)
+
 case "${desired_command}" in
+  checksum)
+    checksum_command "$default_yaml" "${subcommand:-}"
+    ;;
   download)
     download_command "$default_yaml" "${subcommand:-}"
     ;;
-  checksum)
-    checksum_command "$default_yaml" "${subcommand:-}"
+  update)
+    update_command "$default_yaml" "${subcommand:-}"
     ;;
 esac
