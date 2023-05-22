@@ -211,16 +211,24 @@ download_utility() (
   fi
 )
 
+# workaround confinements such as snap
+yq_confined_edit() (
+  tmp_file="$2"
+  yq eval "$1" < "${tmp_file}" > "${tmp_file}2"
+  mv "${tmp_file}2" "${tmp_file}"
+)
+
 # $1=file $2=utility
 get_update() (
   setup_environment "$@"
   if [ -z "${update:-}" ]; then
     echo "SKIP ${2}: no update script." >&2
-    yq e -i ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
+    yq_confined_edit ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
     return
   fi
   new_version="$(read_yaml "$@" update shell | tr -d '\r')" || return $?
-  yq e -i ".versions.$2 |= \"${new_version}\"" "$TMP_DIR/versions.yml"
+  yq_confined_edit ".versions.$2 |= \"${new_version}\"" \
+    "$TMP_DIR/versions.yml" \
 )
 
 filter_versions() (
