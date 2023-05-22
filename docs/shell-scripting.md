@@ -111,11 +111,13 @@ only: "[ ${arch} = x86_64 ]"
 
 ### `checksum_file` shell script
 
-Points to a file created by
-[`create-utility-checksums.sh`](../create-utility-checksums.sh) and validates
-the checksum for the individual file contained within.  It is evaluated as an
-echo statement.  However, you can do some more advanced shell scripting if you
-need to.
+Points to a file created by the following command.
+
+    ./download-utilities.sh --checksum
+
+It validates the checksum for the individual file contained within.  It is
+evaluated as an echo statement.  However, you can do some more advanced shell
+scripting if you need to.
 
 The shell script generating the checksum file path is the following.
 

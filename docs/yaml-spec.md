@@ -9,7 +9,7 @@ utility:
   # name of utility downloaded to the dest
   utility_key:
     arch: # translation map from arch value to download file value
-    checksum_file: # a file created by create-utility-checksums.sh script
+    checksum_file: # a file created by './download-utilities.sh --checksum'
     dest: /usr/local/bin # destination path to download utility
     downlaod: # a URL to download the utility
     extension: echo tar.gz # optional shell script to echo the extension

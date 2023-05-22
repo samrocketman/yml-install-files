@@ -11,7 +11,7 @@ mkdir scratch
 ./download-utilities.sh download-utilities.yml
 
 # generate a checksum file
-./create-utility-checksums.sh download-utilities.yml > checksums.sha256sum
+./download-utilities.sh --checksum download-utilities.yml > checksums.sha256sum
 
 # in-place update versions of utilities within YAML
 ./update-utilities.sh download-utilities.yml
@@ -50,7 +50,7 @@ want to ensure integrity of all downloaded utilities.
 Create checksums of installed utilities.
 
 ```bash
-./create-utility-checksums.sh > checksums.sha256
+./download-utilities.sh --checksum > checksums.sha256
 
 # which you can then validate
 sha256sum -c checksums.sha256
