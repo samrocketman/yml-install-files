@@ -20,6 +20,24 @@ defaults: &defaults
   dest: ./scratch
   perm: '0755'
   checksum_file: checksums/$(uname)-$(arch).sha256
+  # Universal update; see gimme utility where update is overridden
+  update: |
+    case "${download}" in
+      https://github.com/*)
+        owner="$(awk -F/ '{print $4"/"$5}' <<< "${download}")"
+        url=https://github.com/"${owner}"/releases/latest
+        curl -sSfI "$url" |
+        awk '$1 == "location:" { gsub(".*/[^0-9.]*", "", $0); print}'
+        ;;
+      https://dl.k8s.io/release*)
+        curl -sSfL https://dl.k8s.io/release/stable.txt |
+        awk '{gsub("v", "", $0); print}'
+        ;;
+      https://get.helm.sh/*)
+        curl -sSfI https://github.com/helm/helm/releases/latest |
+        awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
+        ;;
+    esac
   # owner: someuser is also available
   # pre_command: shell scripting available
   # post_command: shell scripting available
@@ -33,9 +51,6 @@ utility:
       x86_64: x64
       aarch64: arm64
     download: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v${version}/cyclonedx-${os}-${arch}
-    update: >
-      curl -sSfI https://github.com/CycloneDX/cyclonedx-cli/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   docker-compose:
     <<: *defaults
     os:
@@ -44,16 +59,10 @@ utility:
     arch:
       arm64: aarch64
     download: https://github.com/docker/compose/releases/download/v${version}/docker-compose-${os}-${arch}
-    update: >
-      curl -sSfI https://github.com/docker/compose/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   dumb-init:
     <<: *defaults
     only: "[ ${os} = Linux ]"
     download: https://github.com/Yelp/dumb-init/releases/download/v${version}/dumb-init_${version}_${arch}
-    update: >
-      curl -sSfI https://github.com/Yelp/dumb-init/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   gh:
     <<: *defaults
     os:
@@ -75,12 +84,10 @@ utility:
         tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh';
       fi
     download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
-    update: >
-      curl -sSfI https://github.com/cli/cli/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   gimme:
     <<: *defaults
     download: https://raw.githubusercontent.com/travis-ci/gimme/${version}/gimme
+    update:
   goss:
     <<: *defaults
     os:
@@ -92,9 +99,6 @@ utility:
     # Mac OS is alpha and Mac only supports AMD64.  Linux supports arm and AMD64
     only: "[ ! ${os} = alpha-darwin ] || [ ${arch} = amd64 ]"
     download: https://github.com/goss-org/goss/releases/download/v${version}/goss-${os}-${arch}
-    update: >
-      curl -sSfI https://github.com/goss-org/goss/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   helm:
     <<: *defaults
     pre_command: rm -f ${dest}/${utility}
@@ -113,9 +117,6 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    update: >
-      curl -sSfI https://github.com/helm/helm/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   jq:
     <<: *defaults
     only: "[ ${arch} = x86_64 ]"
@@ -123,9 +124,6 @@ utility:
       Linux: linux64
       Darwin: osx-amd64
     download: https://github.com/stedolan/jq/releases/download/jq-${version}/jq-${os}
-    update: >
-      curl -sSfI https://github.com/stedolan/jq/releases/latest |
-      awk '$1 == "location:" { gsub(".*/jq-", "", $0); print}'
   kubeconform:
     <<: *defaults
     os:
@@ -137,9 +135,6 @@ utility:
     pre_command: rm -f ${dest}/${utility}
     download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner kubeconform
-    update: >
-      curl -sSfI https://github.com/yannh/kubeconform/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   kubectl:
     <<: *defaults
     os:
@@ -149,9 +144,6 @@ utility:
       x86_64: amd64
       aarch64: arm64
     download: https://dl.k8s.io/release/v${version}/bin/${os}/${arch}/kubectl
-    update: >
-      curl -sSfL https://dl.k8s.io/release/stable.txt |
-      awk '{gsub("v", "", $0); print}'
   kubeval:
     <<: *defaults
     only: "[ ${arch} = amd64 ]"
@@ -163,9 +155,6 @@ utility:
     pre_command: rm -f ${dest}/${utility}
     extract: tar -xzC ${dest}/ --no-same-owner kubeval
     download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
-    update: >
-      curl -sSfI https://github.com/instrumenta/kubeval/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   kustomize:
     <<: *defaults
     pre_command: rm -f ${dest}/${utility}
@@ -177,9 +166,6 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    update: >
-      curl -sSfI https://github.com/kubernetes-sigs/kustomize/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   minikube:
     <<: *defaults
     os:
@@ -189,9 +175,6 @@ utility:
       x86_64: amd64
       aarch64: arm64
     download: https://github.com/kubernetes/minikube/releases/download/v${version}/minikube-${os}-${arch}
-    update: >
-      curl -sSfI https://github.com/kubernetes/minikube/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
   yq:
     <<: *defaults
     os:
@@ -201,6 +184,3 @@ utility:
       x86_64: amd64
       aarch64: arm64
     download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}
-    update: >
-      curl -sSfI https://github.com/mikefarah/yq/releases/latest |
-      awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
