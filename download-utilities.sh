@@ -143,11 +143,16 @@ setup_environment() {
   export arch checksum_file default_download default_download_extract \
     default_eval_shell dest download extension extract only os owner perm \
     post_command pre_command update utility version
+
+  if [ "${desired_command:-}" = download ] && [ -z "${version:-}" ]; then
+    version="$(get_latest_util_version "$@")" || return 5
+  fi
+
 }
 
 # $1=file $2=utility
 download_utility() (
-  setup_environment "$@"
+  setup_environment "$@" || return 5
 
   if [ -z "${download:-}" ]; then
     echo "SKIP ${2}: no download URL specified." >&2
@@ -218,6 +223,14 @@ yq_confined_edit() (
   mv "${tmp_file}2" "${tmp_file}"
 )
 
+get_latest_util_version() (
+  if [ -z "${update:-}" ]; then
+    echo "ERROR: No version or update script available for ${utility}" >&2
+    return 1
+  fi
+  read_yaml "$@" update shell | tr -d '\r'
+)
+
 # $1=file $2=utility
 get_update() (
   setup_environment "$@"
@@ -226,7 +239,7 @@ get_update() (
     yq_confined_edit ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
     return
   fi
-  new_version="$(read_yaml "$@" update shell | tr -d '\r')" || return $?
+  new_version="$(get_latest_util_version "$@")" || return $?
   yq_confined_edit ".versions.$2 |= \"${new_version}\"" \
     "$TMP_DIR/versions.yml" \
 )
@@ -398,6 +411,7 @@ update_command() {
 }
 
 process_args() {
+  export desired_command
   desired_command=download
   while [ $# -gt 0 ]; do
     case "$1" in
