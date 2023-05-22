@@ -40,12 +40,12 @@ set -e
   exit 1
 }
 docker build -t update -f checksums/Dockerfile checksums
-#update_versions
-#if git diff --quiet --exit-code download-utilities.yml && \
-#  [ -z "${checksum:-}" ]; then
-#  echo 'No updates.' >&2
-#  exit
-#fi
+update_versions
+if git diff --quiet --exit-code download-utilities.yml && \
+  [ -z "${checksum:-}" ]; then
+  echo 'No updates.' >&2
+  exit
+fi
 update_arch Linux x86_64
 update_arch Linux aarch64
 update_arch Darwin x86_64
