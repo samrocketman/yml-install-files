@@ -22,20 +22,34 @@ defaults: &defaults
   checksum_file: checksums/$(uname)-$(arch).sha256
   # Universal update; see gimme utility where update is overridden
   update: |
+    http_head() {
+      if type -P curl > /dev/null; then
+        curl -sSfI "$@"
+      else
+        wget -S --spider -o - "$@" 2>&1
+      fi
+    }
+    http_get() {
+      if type -P curl > /dev/null; then
+        curl -sSfL "$@"
+      else
+        wget -q -O - "$@"
+      fi
+    }
     case "${download}" in
       https://github.com/*)
         owner="$(awk -F/ '{print $4"/"$5}' <<< "${download}")"
         url=https://github.com/"${owner}"/releases/latest
-        curl -sSfI "$url" |
-        awk '$1 == "location:" { gsub(".*/[^0-9.]*", "", $0); print}'
+        http_head "$url" |
+        awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'
         ;;
       https://dl.k8s.io/release*)
-        curl -sSfL https://dl.k8s.io/release/stable.txt |
+        http_get https://dl.k8s.io/release/stable.txt |
         awk '{gsub("v", "", $0); print}'
         ;;
       https://get.helm.sh/*)
-        curl -sSfI https://github.com/helm/helm/releases/latest |
-        awk '$1 == "location:" { gsub(".*/v?", "", $0); print}'
+        http_head https://github.com/helm/helm/releases/latest |
+        awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'
         ;;
     esac
   # owner: someuser is also available

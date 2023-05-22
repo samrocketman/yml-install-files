@@ -17,7 +17,7 @@ if [ -z "${default_download_extract:-}" ]; then
   default_download_extract='curl -sSfL ${download} | ${extract}'
 fi
 if [ -z "${default_eval_shell:-}" ]; then
-  default_eval_shell='/bin/bash -euxo pipefail'
+  default_eval_shell='/bin/bash -eux'
 fi
 if [ -z "${default_download_head:-}" ]; then
   default_download_head='curl -sSfI ${download}'
@@ -280,10 +280,6 @@ download_temp_yq() (
 
 check_yaml() (
   result=0
-  if ! type -P curl > /dev/null; then
-    echo 'ERROR: curl utility is required.' >&2
-    result=1
-  fi
   if ! type -P yq > /dev/null || [ -n "${force_yq:-}" ]; then
     if ! download_temp_yq; then
       echo 'ERROR: could not download a usable yq.' >&2
