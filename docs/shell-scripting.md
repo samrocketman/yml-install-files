@@ -1,38 +1,37 @@
 # Basic shell scripts
 
-All shell scripts are filtered by bash before they're executed.  This is similar
-to `envsubst` but it is more powerful because you have the full power of complex
-substitution in bash.  Because of this you may need to escape local variables if
-you're using them in your script.  The following is an example.
+The following fields support shell scripting as its value:
 
-```yaml
-pre_command: >
-  myvar="value";
-  if [ "${os}" = linux ]; then
-    echo "\$myvar"
-  fi
-```
+- `extract`
+- `only`
+- `post_command`
+- `pre_command`
+- `update`
 
-> **Note**: In the above shell script `\$myvar`, the escaped `$` is for the
-> bash variable substituion.  The final script executed will be `$myvar` after
-> substitution.  Any scripted field operates this way if you use local
-> variables.
+The following fields allow shell substitution scripting.
 
-Because of this, local variables are not recommended due to complexity but they
-are supported via the above string escaping.  Whether a `$` is escaped or not
-will change where it is executed.  For example, `$(uname)` will execute during
-string processing and `\$(uname)` will execute within the context of the
-user-provided script.
+- `checksum_file`
+- `dest`
+- `download`
 
-Prefer simpler scripts over complex ones for readability.
+Static text fields (no shell scripting or substitution available).
+
+- `default_download_extract`
+- `default_download`
+- `default_eval_shell`
+- `dest`
+- `extension`
+- `owner`
+- `perm`
+- `version`
+
+Some text fields are filtered by bash.  This means they can have some more
+advanced shell logic
 
 ### Pre and post command scripts
 
 `pre_command` and `post_command` are executed as normal stand alone scripts
-before or after download.  These should be small and will execute before or
-after each download.
-
-No bash variable substitution occurs beforehand.
+before or after download.
 
 ### Downloading
 
@@ -47,6 +46,15 @@ You can override this in your YAML with:
 
 ```yaml
 default_download: "wget -q -O '${dest}/${utility}' ${download}"
+```
+
+### Shell substitution scripting
+
+Fields that support shell substitution have all of the substitution capabilities
+available to bash.  For example,
+
+```yaml
+checksum_file: checksums/$(uname)-$(arch).sha256
 ```
 
 ### `extract` downloaded archives

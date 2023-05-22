@@ -198,10 +198,10 @@ download_utility() (
     return 1
   fi
   if [ -n "${perm:-}" ]; then
-    echo "chmod ${perm} '${dest}/$2'" | eval_shell || return $?
+    echo "chmod '${perm}' '${dest}/$2'" | eval_shell || return $?
   fi
   if [ -n "${owner:-}" ]; then
-      echo "chown ${owner} '${dest}/$2'" | eval_shell || return $?
+      echo "chown '${owner}' '${dest}/$2'" | eval_shell || return $?
   fi
   if [ -n "${post_command:-}" ]; then
     read_yaml "$@" post_command shell || return $?
