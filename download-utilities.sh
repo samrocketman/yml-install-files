@@ -45,12 +45,14 @@ get_binary() (
   echo "${dest}/${utility}"
 )
 
-# $1=file $2=utility $3=field
+# $1=file $2=utility $3=field $4=one_of:[none, env, env_shell, shell]
 read_yaml_arch() (
   byname=".utility.$2.$3"
   byos=".utility.$2.$3.${os}"
   byarch=".utility.$2.$3.${os}.${arch}"
-  eval "default_val=\"\${${3}:-}\""
+  if [ "$4" = none ]; then
+    eval "default_val=\"\${${3}:-}\""
+  fi
   yq -r \
     "select(${byarch} | type == \"!!str\")${byarch} // \
     select(${byos}.default | type == \"!!str\")${byos}.default // \
