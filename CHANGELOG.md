@@ -8,6 +8,7 @@ New feature:
 - Documentation for environment variables.
 - Change default utilities to create and validate checksums.  This supports
   users changing away from the default SHA-256 algorithm.
+- Document exit code.
 
 Bug fixes:
 

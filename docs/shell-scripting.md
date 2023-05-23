@@ -42,6 +42,15 @@ Static text fields (no shell scripting or substitution available).
 - `perm`
 - `version`
 
+### Exit codes
+
+If you wish to abort any retry logic and immediately force-exit the script
+non-zero, then you should return an exit code 5.
+
+For example,
+
+    exit 5
+
 ### Scripting environment variables
 
 All support YAML fields show up as environment variables including variables
