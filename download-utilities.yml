@@ -12,6 +12,7 @@ versions:
   kubeval: 0.16.1
   kustomize: 5.0.3
   minikube: 1.30.1
+  saml2aws: 2.36.8
   yq: 4.34.1
 
 
@@ -144,7 +145,7 @@ utility:
         rm -f ${dest}/${utility}
       fi
     download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
-    extract: tar -xzC ${dest}/ --no-same-owner kubeconform
+    extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   kubectl:
     <<: *defaults
     os:
@@ -166,7 +167,7 @@ utility:
       if [ "${checksum_failed:-true}" = true ]; then
         rm -f ${dest}/${utility}
       fi
-    extract: tar -xzC ${dest}/ --no-same-owner kubeval
+    extract: tar -xzC ${dest}/ --no-same-owner ${utility}
     download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
   kustomize:
     <<: *defaults
@@ -175,7 +176,7 @@ utility:
         rm -f ${dest}/${utility}
       fi
     download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
-    extract: tar -xzC ${dest}/ --no-same-owner kustomize
+    extract: tar -xzC ${dest}/ --no-same-owner ${utility}
     os:
       Linux: linux
       Darwin: darwin
@@ -191,6 +192,16 @@ utility:
       x86_64: amd64
       aarch64: arm64
     download: https://github.com/kubernetes/minikube/releases/download/v${version}/minikube-${os}-${arch}
+  saml2aws:
+    <<: *defaults
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    extract: tar -xzC ${dest}/ --no-same-owner ${utility}
+    download: https://github.com/Versent/saml2aws/releases/download/v${version}/saml2aws_${version}_${os}_${arch}.tar.gz
   yq:
     <<: *defaults
     os:
