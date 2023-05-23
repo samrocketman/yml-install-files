@@ -1,0 +1,14 @@
+version:
+  maven.tar.gz: 3.9.2
+utility:
+  maven.tar.gz:
+    dest: /tmp
+    download: https://dlcdn.apache.org/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.tar.gz
+    post_command:
+      cd scratch
+      tar -xzf /tmp/maven.tar.gz
+      rm /tmp/maven.tar.gz
+    update: |
+      wget --quiet -O - https://dlcdn.apache.org/maven/maven-3 |
+      awk '$0 ~ /href="[0-9.]+/ { print gensub(/.*href="([0-9.]*).*/, "\\1", "g") }' |
+      sort -Vr | head -n1

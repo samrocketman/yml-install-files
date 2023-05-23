@@ -1,0 +1,16 @@
+versions:
+  yq: 4.33.3
+utility:
+  yq:
+    download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}
+    dest: ./scratch
+    perm: '0755'
+    os:
+      Linux: linux
+      Darwin: darwin
+    arch:
+      x86_64: amd64
+      aarch64: arm64
+    update:
+      curl -sSfI https://github.com/mikefarah/yq/releases/latest |
+      awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'

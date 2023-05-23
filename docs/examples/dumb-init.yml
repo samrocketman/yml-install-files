@@ -1,0 +1,9 @@
+utility:
+  dumb-init:
+    dest: ./scratch
+    perm: '0755'
+    only: "[ ${os} = Linux ]"
+    download: https://github.com/Yelp/dumb-init/releases/download/v${version}/dumb-init_${version}_${arch}
+    update:
+      curl -sSfI https://github.com/Yelp/dumb-init/releases/latest |
+      awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'

@@ -14,6 +14,7 @@ validation. Intended for Docker.
 - [Use case](docs/use-case.md)
 - [Example usage](docs/example-usage.md)
 - [YAML spec](docs/yaml-spec.md)
+- [YAML examples](docs/yaml-examples.md)
 - [Basic shell scripts](docs/shell-scripting.md)
 
 # Requirements
