@@ -13,16 +13,31 @@ default_yaml="${default_yaml:-download-utilities.yml}"
 yq_mirror="${yq_mirror:-https://github.com}"
 yq_version="${yq_version:-}"
 if [ -z "${default_download:-}" ]; then
-  default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
+  if type -P curl > /dev/null; then
+    default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
+  else
+    # try wget if curl not detected
+    default_download=$'wget -q -O \'${dest}/${utility}\' ${download}'
+  fi
 fi
 if [ -z "${default_download_extract:-}" ]; then
-  default_download_extract='curl -sSfL ${download} | ${extract}'
+  if type -P curl > /dev/null; then
+    default_download_extract='curl -sSfL ${download} | ${extract}'
+  else
+    # try wget if curl not detected
+    default_download_extract='wget -q -O - ${download} | ${extract}'
+  fi
 fi
 if [ -z "${default_eval_shell:-}" ]; then
   default_eval_shell='/bin/bash -eux'
 fi
 if [ -z "${default_download_head:-}" ]; then
-  default_download_head='curl -sSfI ${download}'
+  if type -P curl > /dev/null; then
+    default_download_head='curl -sSfI ${download}'
+  else
+    # try wget if curl not detected
+    default_download_head=$'wget -q -S --spider -o - ${download} 2>&1 | tr -d \'\\r\''
+  fi
 fi
 export default_download default_download_extract default_download_head \
   default_eval_shell default_yaml yq_mirror yq_version
@@ -282,7 +297,7 @@ latest_yq() (
   download=https://github.com/mikefarah/yq/releases/latest
   export download
   echo "$default_download_head" | eval_shell |
-  awk '$1 == "location:" { gsub(".*/v?", "", $0); print}' |
+  awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}' |
   tr -d '\r'
 )
 
