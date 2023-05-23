@@ -4,6 +4,7 @@ utility:
     perm: '0755'
     only: "[ ${os} = Linux ]"
     download: https://github.com/Yelp/dumb-init/releases/download/v${version}/dumb-init_${version}_${arch}
-    update:
-      curl -sSfI https://github.com/Yelp/dumb-init/releases/latest |
+    update: |
+      export download=https://github.com/Yelp/dumb-init/releases/latest
+      eval "${default_download_head}" |
       awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'

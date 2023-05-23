@@ -26,5 +26,6 @@ utility:
       linux:
         tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh'
     update: |
-      curl -sSfI https://github.com/cli/cli/releases/latest |
+      export download=https://github.com/cli/cli/releases/latest
+      eval "${default_download_head}" |
       awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'

@@ -1,5 +1,5 @@
 versions:
-  yq: 4.33.3
+  yq: 4.34.1
 utility:
   yq:
     download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}
@@ -11,6 +11,7 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    update:
-      curl -sSfI https://github.com/mikefarah/yq/releases/latest |
+    update: |
+      export download=https://github.com/mikefarah/yq/releases/latest
+      eval "${default_download_head}" |
       awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'

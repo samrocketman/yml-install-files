@@ -19,16 +19,10 @@ utility:
       rm /tmp/maven.tar.gz
     update: |
       # get update for maven-3
-      http_get() (
-        if type -P curl; then
-          curl -sSfL "$@"
-        elif type -P wget; then
-          wget --quiet -O - "$@"
-        else
-          echo 'No wget or curl found.  Cannot check for update.' >&2
-          return 1
-        fi
-      )
-      set -o pipefail
-      url=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/maven-metadata.xml
-      http_get "${url}" | grep -o '3\.[.0-9]\+' | sort -Vr | head -n1
+      download=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/maven-metadata.xml
+      # cat will read from stdin and print to stdout
+      extract=cat
+      export download extract
+      # Do more advanced extraction outside of the eval via bash piped commands
+      eval "${default_download_extract}" |
+      grep -o '3\.[.0-9]\+' | sort -Vr | head -n1
