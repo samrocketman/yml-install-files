@@ -3,12 +3,13 @@ versions:
 utility:
   maven.tar.gz:
     dest: /tmp
-    only: "[ ! -e scratch/apache-maven ]"
+    # ignore the only condition if an upgrade is being performed
+    only: '[ ! -e scratch/apache-maven ] || [ -n "${skip_checksum:-}" ]'
     download: https://dlcdn.apache.org/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.tar.gz
     checksum_file: maven.sha256
     post_command: |
       # checksuming so skip post-download action
-      if [ -n "${checksum:-}" ]; then
+      if [ -n "${skip_checksum:-}" ]; then
         exit
       fi
       cd scratch
