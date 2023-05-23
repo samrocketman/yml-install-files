@@ -319,12 +319,13 @@ check_yaml() (
   if [ ! -f "$1" ]; then
     echo "ERROR: $1 does not exist." >&2
     result=1
+  else
+    if ! yq . < "$1" > /dev/null; then
+      echo "ERROR: $1 must be valid YAML." >&2
+      result=1
+    fi
   fi
 
-  if ! yq . < "$1" > /dev/null; then
-    echo "ERROR: $1 must be valid YAML." >&2
-    result=1
-  fi
   return "$result"
 )
 
@@ -399,7 +400,7 @@ checksum_command() {
       yq -r '.utility | keys | .[]' "$1"
     fi
   ) | while read -er util; do
-    get_binary "$default_yaml" "$util"
+    get_binary "$yaml_file" "$util"
   done | checksum
 }
 
@@ -429,8 +430,8 @@ process_args() {
         help
         ;;
       *)
-        if [ -f "$1" ]; then
-          default_yaml="$1"
+        if [ -z "${yaml_file:-}" ]; then
+          yaml_file="$1"
           shift
         else
           subcommand="$1"
@@ -441,21 +442,25 @@ process_args() {
   done
 }
 
+export yaml_file
 process_args "$@"
+if [ -z "${yaml_file:-}" ]; then
+  yaml_file="${default_yaml:-}"
+fi
 
 export TMP_DIR="$(mktemp -d)"
 trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
-check_yaml "$default_yaml"
+check_yaml "$yaml_file"
 
 case "${desired_command}" in
   checksum)
-    checksum_command "$default_yaml" "${subcommand:-}"
+    checksum_command "$yaml_file" "${subcommand:-}"
     ;;
   download)
-    download_command "$default_yaml" "${subcommand:-}"
+    download_command "$yaml_file" "${subcommand:-}"
     ;;
   update)
-    update_command "$default_yaml" "${subcommand:-}"
+    update_command "$yaml_file" "${subcommand:-}"
     ;;
 esac

@@ -12,6 +12,7 @@ Bug fixes:
   after successful checksum download.
 - A utility or file name is allowed to contain a period.  It used to not work.
 - Fixed a bug which affects the `yq` snap confinement on Ubuntu.
+- Fixed pre-processing checks not properly detecting user-specified yaml files.
 
 # download-utilities v2.0
 
