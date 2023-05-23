@@ -8,6 +8,8 @@ New feature:
 
 Bug fixes:
 
+- :boom: Critical fix: `chmod`, `chown`, and `post_command` was not executed
+  after successful checksum download.
 - A utility or file name is allowed to contain a period.  It used to not work.
 - Fixed a bug which affects the `yq` snap confinement on Ubuntu.
 

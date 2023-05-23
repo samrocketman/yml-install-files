@@ -168,6 +168,7 @@ download_utility() (
   set_debug="set -euxo pipefail;"
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
     checksum_file="$(read_yaml "$@" checksum_file env)"
+    checksum_failed=true
     if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
       if grep -F / > /dev/null <<< "$1"; then
         checksum_file="${1%/*}/${checksum_file}"
@@ -184,7 +185,8 @@ download_utility() (
           sha256sum -c -
         fi
       }; then
-      return
+      # checksum success
+      checksum_failed=false
     fi
     # checksum failed
   fi
@@ -196,13 +198,17 @@ download_utility() (
     echo "        Perhaps ${utility} needs a pre_command to create it." >&2
     return 5
   fi
-  if [ -z "${extract:-}" ]; then
-    # non-extracting direct download utilities
-    read_yaml "$@" default_download env_shell || return $?
-  else
-    read_yaml "$@" default_download_extract env_shell || return $?
+  # try download again if checksum failed
+  if [ "$checksum_failed" = true ]; then
+    if [ -z "${extract:-}" ]; then
+      # non-extracting direct download utilities
+      read_yaml "$@" default_download env_shell || return $?
+    else
+      read_yaml "$@" default_download_extract env_shell || return $?
+    fi
   fi
-  if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
+  if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ] &&
+    [ "$checksum_failed" = true ]; then
     return 1
   fi
   if [ -n "${perm:-}" ]; then

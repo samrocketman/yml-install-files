@@ -3,7 +3,7 @@ version:
 utility:
   maven.tar.gz:
     dest: /tmp
-    only: "[ ! -f scratch/apache-maven ]"
+    only: "[ ! -e scratch/apache-maven ]"
     download: https://dlcdn.apache.org/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.tar.gz
     checksum_file: maven.sha256
     post_command: |
