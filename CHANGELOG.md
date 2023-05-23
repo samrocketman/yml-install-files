@@ -1,3 +1,10 @@
+# download-utilities v2.1
+
+- `version` is now optional if `update` is provided.  IF no version specified,
+  the latest version will be downloaded via an update check.
+- Fixed a bug which affects the `yq` snap on Ubuntu.
+- Add a few small examples.
+
 # download-utilities v2.0
 
 Breaking changes:
