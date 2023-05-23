@@ -47,6 +47,13 @@ Static text fields (no shell scripting or substitution available).
 All support YAML fields show up as environment variables including variables
 documented in [Environment Variables](environment-variables.md).
 
+The following variables are supported and not otherwise documented.
+
+- `checksum_failed` - will be `true` or `false` depending on the checksum
+  validation of the downloaded file.  If `skip_checksum` is set, then this value
+  will be empty.  If you use this in scripting, then checking for a sane default
+  of `${checksum_failed:-true}` is recommended.
+
 ### Pre and post command scripts
 
 `pre_command` and `post_command` will always execute even if the checksum passes

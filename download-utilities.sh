@@ -181,6 +181,7 @@ download_utility() (
     fi
   fi
   set_debug="set -euxo pipefail;"
+  export checksum_failed
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
     checksum_file="$(read_yaml "$@" checksum_file env)"
     checksum_failed=true

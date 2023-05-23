@@ -123,7 +123,10 @@ utility:
       aarch64: arm64
     pre_command:
       default:
-      darwin: rm -f ${dest}/${utility}
+      darwin: |
+        if [ "${checksum_failed:-true}" = true ]; then
+          rm -f ${dest}/${utility}
+        fi
     download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
     extract: |
       if [ ${os} = darwin ] && [ ! "$(uname)" = Linux ]; then
@@ -146,7 +149,10 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    pre_command: rm -f ${dest}/${utility}
+    pre_command: |
+      if [ "${checksum_failed:-true}" = true ]; then
+        rm -f ${dest}/${utility}
+      fi
     download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner kubeconform
   kubectl:
@@ -166,12 +172,18 @@ utility:
       Darwin: darwin
     arch:
       x86_64: amd64
-    pre_command: rm -f ${dest}/${utility}
+    pre_command: |
+      if [ "${checksum_failed:-true}" = true ]; then
+        rm -f ${dest}/${utility}
+      fi
     extract: tar -xzC ${dest}/ --no-same-owner kubeval
     download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
   kustomize:
     <<: *defaults
-    pre_command: rm -f ${dest}/${utility}
+    pre_command: |
+      if [ "${checksum_failed:-true}" = true ]; then
+        rm -f ${dest}/${utility}
+      fi
     download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner kustomize
     os:
