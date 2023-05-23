@@ -1,3 +1,3 @@
 FROM alpine
 SHELL ["/bin/sh", "-exc"]
-RUN apk add --no-cache bash tar
+RUN apk add --no-cache bash

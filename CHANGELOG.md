@@ -1,3 +1,8 @@
+# download-utilities v2.3
+
+- Use universal options available in `tar` on GNU tar, BSD tar, and BusyBox tar.
+  This drastically improves portability and reduces OS requirements.
+
 # download-utilities v2.2
 
 New feature:

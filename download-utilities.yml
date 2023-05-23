@@ -21,6 +21,10 @@ defaults: &defaults
   dest: ./scratch
   perm: '0755'
   checksum_file: checksums/$(uname)-$(arch).sha256
+  pre_command: |
+    if [ "${checksum_failed:-true}" = true ]; then
+      rm -f ${dest}/${utility}
+    fi
   # Universal update; see gimme utility where update is overridden
   update: |
     case "${download}" in
@@ -79,15 +83,21 @@ utility:
     extension:
       default: tar.gz
       macOS: zip
-    extract: >
-      if [ ${extension} = zip ]; then
-        (
-          cat > /tmp/file.zip;
-          unzip -o -j -d ${dest} /tmp/file.zip '*/bin/gh';
-        ) && rm -f /tmp/file.zip || rm -f /tmp/file.zip;
-      else
-        tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh';
-      fi
+    default_download_extract: |
+      cleanup_on() (
+        if [ -f /tmp/file.zip ]; then
+          rm -f /tmp/file.zip
+        fi
+      )
+      trap cleanup_on EXIT
+      curl -sSfL ${download} | ${extract}
+    extract:
+      macOS: |
+        {
+          cat > /tmp/file.zip
+          unzip -o -j -d ${dest} /tmp/file.zip '*/bin/gh'
+        }
+      linux: tar -xzC ${dest}/ --no-same-owner --strip-components=2 gh_${version}_${os}_${arch}/bin/gh
     download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
   gimme:
     <<: *defaults
@@ -112,19 +122,8 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    pre_command:
-      default:
-      darwin: |
-        if [ "${checksum_failed:-true}" = true ]; then
-          rm -f ${dest}/${utility}
-        fi
     download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
-    extract: |
-      if [ ${os} = darwin ] && [ ! "$(uname)" = Linux ]; then
-        tar -xzC ${dest}/ --no-same-owner --strip-components=1 '*/helm'
-      else
-        tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=1 '*/helm'
-      fi
+    extract: tar -xzC ${dest}/ --no-same-owner --strip-components=1 ${os}-${arch}/helm
   jq:
     <<: *defaults
     only: "[ ${arch} = x86_64 ]"
@@ -140,10 +139,6 @@ utility:
     arch:
       x86_64: amd64
       aarch64: arm64
-    pre_command: |
-      if [ "${checksum_failed:-true}" = true ]; then
-        rm -f ${dest}/${utility}
-      fi
     download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   kubectl:
@@ -163,18 +158,10 @@ utility:
       Darwin: darwin
     arch:
       x86_64: amd64
-    pre_command: |
-      if [ "${checksum_failed:-true}" = true ]; then
-        rm -f ${dest}/${utility}
-      fi
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
     download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
   kustomize:
     <<: *defaults
-    pre_command: |
-      if [ "${checksum_failed:-true}" = true ]; then
-        rm -f ${dest}/${utility}
-      fi
     download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
     os:

@@ -14,6 +14,10 @@ utility:
     extension:
       default: tar.gz
       macOS: zip
+    pre_command: |
+      if [ "${checksum_failed:-true}" = true ]; then
+        rm -f ${dest}/${utility}
+      fi
     default_download_extract: |
       trap '[ ! -f /tmp/file.zip ] || rm -f /tmp/file.zip' EXIT
       curl -sSfL ${download} | ${extract}
@@ -23,8 +27,7 @@ utility:
           cat > /tmp/file.zip
           unzip -o -j -d ${dest} /tmp/file.zip '*/bin/gh'
         }
-      linux:
-        tar -xzC ${dest}/ --overwrite --wildcards --no-same-owner --strip-components=2 '*/bin/gh'
+      linux: tar -xzC ${dest}/ --no-same-owner --strip-components=2 gh_${version}_${os}_${arch}/bin/gh
     update: |
       export download=https://github.com/cli/cli/releases/latest
       eval "${default_download_head}" |
