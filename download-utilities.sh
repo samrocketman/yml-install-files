@@ -199,7 +199,7 @@ download_utility() (
     return 5
   fi
   # try download again if checksum failed
-  if [ "$checksum_failed" = true ]; then
+  if [ "${checksum_failed:-true}" = true ]; then
     if [ -z "${extract:-}" ]; then
       # non-extracting direct download utilities
       read_yaml "$@" default_download env_shell || return $?
@@ -208,7 +208,7 @@ download_utility() (
     fi
   fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ] &&
-    [ "$checksum_failed" = true ]; then
+    [ "${checksum_failed:-}" = true ]; then
     return 1
   fi
   if [ -n "${perm:-}" ]; then
@@ -242,11 +242,11 @@ get_update() (
   setup_environment "$@"
   if [ -z "${update:-}" ]; then
     echo "SKIP ${2}: no update script." >&2
-    yq_confined_edit ".versions.$2 |= \"${version}\"" "$TMP_DIR/versions.yml"
+    yq_confined_edit ".versions.\"$2\" |= \"${version}\"" "$TMP_DIR/versions.yml"
     return
   fi
   new_version="$(get_latest_util_version "$@")" || return $?
-  yq_confined_edit ".versions.$2 |= \"${new_version}\"" \
+  yq_confined_edit ".versions.\"$2\" |= \"${new_version}\"" \
     "$TMP_DIR/versions.yml" \
 )
 
