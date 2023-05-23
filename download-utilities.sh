@@ -39,8 +39,23 @@ if [ -z "${default_download_head:-}" ]; then
     default_download_head=$'wget -q -S --spider -o - ${download} 2>&1 | tr -d \'\\r\''
   fi
 fi
-export default_download default_download_extract default_download_head \
-  default_eval_shell default_yaml yq_mirror yq_version
+if [ -z "${default_checksum:-}" ]; then
+  if type -P shasum > /dev/null; then
+    default_checksum='xargs shasum -a 256'
+  else
+    default_checksum='xargs sha256sum'
+  fi
+fi
+if [ -z "${default_verify_checksum:-}" ]; then
+  if type -P shasum > /dev/null; then
+    default_verify_checksum='shasum -a 256 -c -'
+  else
+    default_verify_checksum='sha256sum -c -'
+  fi
+fi
+export default_checksum default_download default_download_extract \
+  default_download_head default_eval_shell default_verify_checksum \
+  default_yaml yq_mirror yq_version
 
 yq() (
   if [ -x "${TMP_DIR:-}"/yq ]; then
@@ -195,11 +210,7 @@ download_utility() (
       return 1
     fi
     if grep -F "${dest}/${utility}" "${checksum_file}" | {
-        if type -P shasum > /dev/null; then
-          shasum -a 256 -c -
-        else
-          sha256sum -c -
-        fi
+        eval "${default_verify_checksum}"
       }; then
       # checksum success
       checksum_failed=false
@@ -346,11 +357,7 @@ check_yaml() (
 )
 
 checksum() {
-  if type -P shasum > /dev/null; then
-    xargs shasum -a 256
-  else
-    xargs sha256sum
-  fi
+  eval "${default_checksum}"
 }
 
 help() {

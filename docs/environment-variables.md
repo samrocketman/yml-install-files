@@ -18,7 +18,11 @@ skip_checksum=''
 force_yq=''
 yq_mirror='https://github.com'
 yq_version=''
+```
 
+Different variable defaults depending on existence of `curl`.
+
+```bash
 # if curl is detected these are the defaults
 default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
 default_download_extract='curl -sSfL ${download} | ${extract}'
@@ -28,6 +32,18 @@ default_download_head='curl -sSfI ${download}'
 default_download=$'wget -q -O \'${dest}/${utility}\' ${download}'
 default_download_extract='wget -q -O - ${download} | ${extract}'
 default_download_head=$'wget -q -S --spider -o - ${download} 2>&1 | tr -d \'\\r\''
+```
+
+Different variable defaults depending on the existence of `shasum`.
+
+```bash
+# if shasum is detected these are the defaults
+default_checksum='xargs shasum -a 256'
+default_verify_checksum='shasum -a 256 -c -'
+
+# alternate, fall back to sha256sum if no shasum
+default_checksum='xargs sha256sum'
+default_verify_checksum='sha256sum -c -'
 ```
 
 ### Variable Definition
@@ -76,3 +92,21 @@ Variables which control how utilities and archives get downloaded.
   - `download` is a user-provided field in YAML; however, users would typically
     override this environment variable in the `update` field when checking for
     software updates.
+
+Variables for checksumming.
+
+- `default_checksum` - A small shell script evaluated to read a list of file
+  names on stdin.  The output will be checksums with a full path of the file
+  names.  The full path to the file name is required in the result in order for
+  validation logic to filter checksums by file name.
+- `default_verify_checksum`
+
+Example of overriding checksum variables to validate SHA-512 instead of SHA-256.
+
+```bash
+default_checksum='xargs sha512sum'
+default_verify_checksum='sha512sum -c -'
+export default_checksum default_verify_checksum
+
+./download-utilities.sh
+```

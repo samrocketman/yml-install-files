@@ -6,6 +6,8 @@ New feature:
   enables running from MacOS, Desktop Linux, or even Alpine Linux (via busybox
   `wget`).
 - Documentation for environment variables.
+- Change default utilities to create and validate checksums.  This supports
+  users changing away from the default SHA-256 algorithm.
 
 Bug fixes:
 
