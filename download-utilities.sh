@@ -49,9 +49,9 @@ get_binary() (
 
 # $1=file $2=utility $3=field $4=one_of:[none, env, env_shell, shell]
 read_yaml_arch() (
-  byname=".utility.$2.$3"
-  byos=".utility.$2.$3.${os}"
-  byarch=".utility.$2.$3.${os}.${arch}"
+  byname=".utility.\"$2\".$3"
+  byos=".utility.\"$2\".$3.${os}"
+  byarch=".utility.\"$2\".$3.${os}.${arch}"
   if [ "$4" = none ] ||
     grep '^default_' <<< "$3" > /dev/null; then
     eval "default_val=\"\${${3}:-}\""
@@ -120,9 +120,9 @@ setup_environment() {
   fi
 
   # static variables
-  arch="$(yq -r ".utility.$2.arch.${arch} // \"${arch}\"" "$1")"
-  os="$(yq -r ".utility.$2.os.${os} // \"${os}\"" "$1")"
-  version="$(yq -r ".versions.$2 // .utility.$2.version // \"\"" "$1")"
+  arch="$(yq -r ".utility.\"$2\".arch.${arch} // \"${arch}\"" "$1")"
+  os="$(yq -r ".utility.\"$2\".os.${os} // \"${os}\"" "$1")"
+  version="$(yq -r ".versions.\"$2\" // .utility.\"$2\".version // \"\"" "$1")"
   utility="$2"
 
   # variables referenced by OS or architecture

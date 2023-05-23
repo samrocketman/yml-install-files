@@ -1,9 +1,15 @@
 # download-utilities v2.1
 
+New feature:
+
 - `version` is now optional if `update` is provided.  IF no version specified,
   the latest version will be downloaded via an update check.
-- Fixed a bug which affects the `yq` snap on Ubuntu.
 - Add a few small examples.
+
+Bug fixes:
+
+- A utility or file name is allowed to contain a period.  It used to not work.
+- Fixed a bug which affects the `yq` snap confinement on Ubuntu.
 
 # download-utilities v2.0
 

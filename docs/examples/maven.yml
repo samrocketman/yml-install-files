@@ -3,10 +3,17 @@ version:
 utility:
   maven.tar.gz:
     dest: /tmp
+    only: "[ ! -f scratch/apache-maven ]"
     download: https://dlcdn.apache.org/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.tar.gz
-    post_command:
+    checksum_file: maven.sha256
+    post_command: |
+      # checksuming so skip post-download action
+      if [ -n "${checksum:-}" ]; then
+        exit
+      fi
       cd scratch
       tar -xzf /tmp/maven.tar.gz
+      ln -s apache-maven-"${version}" apache-maven
       rm /tmp/maven.tar.gz
     update: |
       wget --quiet -O - https://dlcdn.apache.org/maven/maven-3 |
