@@ -1,3 +1,21 @@
+# download-utilities v2.2
+
+New feature:
+
+- Support `curl` or `wget` to enhance portability and reduce dependencies.  This
+  enables running from MacOS, Desktop Linux, or even Alpine Linux (via busybox
+  `wget`).
+- Documentation for environment variables.
+
+Bug fixes:
+
+- Fixed bug in `download-utilities.yml` and added a new variable,
+  `checksum_failed`, for scripting.
+
+Other changes:
+
+- Update maven example and enhance YAML Examples documentation.
+
 # download-utilities v2.1
 
 New feature:
