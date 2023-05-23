@@ -2,7 +2,7 @@
 
 New feature:
 
-- `version` is now optional if `update` is provided.  IF no version specified,
+- `version` is now optional if `update` is provided.  If no version specified,
   the latest version will be downloaded via an update check.
 - Add a few small examples.
 
