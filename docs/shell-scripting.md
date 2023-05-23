@@ -23,7 +23,9 @@ The following fields support shell scripting as its value:
 - `pre_command`
 - `update`
 
-The following fields allow shell substitution scripting.
+The following fields allow shell substitution scripting.  Bash is used for
+substitution, so you can do anything documented in [Shell Expansions of the Bash
+Manual][bash].
 
 - `checksum_file`
 - `dest`
@@ -40,8 +42,10 @@ Static text fields (no shell scripting or substitution available).
 - `perm`
 - `version`
 
-Some text fields are filtered by bash.  This means they can have some more
-advanced shell logic
+### Scripting environment variables
+
+All support YAML fields show up as environment variables including variables
+documented in [Environment Variables](environment-variables.md).
 
 ### Pre and post command scripts
 
@@ -187,3 +191,5 @@ only: "[ ${arch} = x86_64 ]"
 
 > Note: the value of `${arch}` should be considered after variable translation.
 > This example assumes no translation.
+
+[bash]: https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html

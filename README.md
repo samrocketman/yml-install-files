@@ -16,6 +16,7 @@ validation. Intended for Docker.
 - [YAML spec](docs/yaml-spec.md)
 - [YAML examples](docs/yaml-examples.md)
 - [Basic shell scripts](docs/shell-scripting.md)
+- [Environment Variables](docs/environment-variables.md)
 
 # Requirements
 
