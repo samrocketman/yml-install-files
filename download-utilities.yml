@@ -12,7 +12,7 @@ versions:
   kubeval: 0.16.1
   kustomize: 5.0.3
   minikube: 1.30.1
-  yq: 4.33.3
+  yq: 4.34.1
 
 
 defaults: &defaults
