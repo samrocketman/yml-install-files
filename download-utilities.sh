@@ -416,6 +416,7 @@ download_command() {
 }
 
 checksum_command() {
+  export skip_checksum=1
   (
     if [ -n "${2:-}" ]; then
       echo "$2"
