@@ -2,6 +2,7 @@
 
 - Use universal options available in `tar` on GNU tar, BSD tar, and BusyBox tar.
   This drastically improves portability and reduces OS requirements.
+- Now works on alpine with no extra fuss.
 
 # download-utilities v2.2
 
