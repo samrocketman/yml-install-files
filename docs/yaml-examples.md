@@ -1,5 +1,24 @@
 # Some YAML examples
 
+### Downloading versions
+
+If you specify `update` without specifying `version`, then the latest version
+will always be downloaded.
+
+YAML example: [dumb-init][dumb-init]
+
+```bash
+./download-utilities.sh docs/examples/dumb-init.yml
+```
+
+If you specify a specific `version`, then only that version will be downloaded.
+
+YAML example: [yq][yq]
+
+```bash
+./download-utilities.sh docs/examples/yq.yml
+```
+
 ### Complex download of a utility
 
 YAML example: [GitHub CLI][cli]
@@ -11,6 +30,11 @@ From repository root run the following command.
 ```
 
 ### Post actions and upgrading utilities
+
+You can specify a `checksum_file` to validate the download, and run custom
+commands before or after the download via `pre_command` and `post_command`.  If
+you wanted to skip downloading if given certain conditions then you would
+specify a shell conditional in `only`.
 
 YAML example: [Maven][maven]
 
@@ -34,17 +58,11 @@ export skip_checksum=1
 ./download-utilities.sh docs/examples/maven.yml
 
 # update the checksum
-./download-utilities.sh --checksum docs/examples/maven.yml
+./download-utilities.sh --checksum docs/examples/maven.yml \
+  > docs/examples/maven.sha256
 
 unset skip_checksum
 ```
-
-### Simple examples
-
-Other YAML examples:
-
-- [dumb-init][dumb-init]
-- [yq][yq]
 
 ### Complex example
 
