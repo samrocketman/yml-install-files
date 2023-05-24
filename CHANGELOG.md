@@ -2,6 +2,7 @@
 
 - DRY up `download-utilities.yml` with `os` and `arch` defaults.
 - Add `docker-buildx` to examples.
+- Add `rvm-installer` to examples.
 
 # download-utilities v2.3
 

@@ -13,6 +13,7 @@ versions:
   kubeval: 0.16.1
   kustomize: 5.0.3
   minikube: 1.30.1
+  rvm-installer: 1.29.12
   saml2aws: 2.36.8
   yq: 4.34.1
 
@@ -58,6 +59,21 @@ defaults: &defaults
   # pre_command: shell scripting available
   # post_command: shell scripting available
 utility:
+  rvm-installer:
+    <<: *defaults
+    download: https://github.com/rvm/rvm/archive/refs/tags/${version}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner --strip-components=2 rvm-${version}/binscripts/${utility}
+    post_command: |
+      if [ -n "${checksum_failed:-}" -a "${checksum_failed:-true}" = false ]; then
+        exit
+      fi
+      # can be swapped out with a GitHub release proxy
+      # escape forward slashes
+      base='github.com\/rvm\/rvm'
+      sed -i.bak -e 's/\( *\)DEFAULT_SOURCES=(github.com.*/\1DEFAULT_SOURCES=('"${base}"')/' "${dest}/${utility}"
+      rm "${dest}/${utility}".bak
+      sed -i.bak -e 's/archive\//archive\/refs\/tags\//g' "${dest}/${utility}"
+      rm "${dest}/${utility}".bak
   cyclonedx:
     <<: *defaults
     os:
