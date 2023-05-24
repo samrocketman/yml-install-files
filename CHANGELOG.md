@@ -1,6 +1,7 @@
 # download-utilities v2.4
 
 - DRY up `download-utilities.yml` with `os` and `arch` defaults.
+- Add `docker-buildx` to examples.
 
 # download-utilities v2.3
 
