@@ -1,3 +1,7 @@
+# download-utilities v2.4
+
+- DRY up `download-utilities.yml` with `os` and `arch` defaults.
+
 # download-utilities v2.3
 
 - Use universal options available in `tar` on GNU tar, BSD tar, and BusyBox tar.

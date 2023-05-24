@@ -21,6 +21,12 @@ defaults: &defaults
   dest: ./scratch
   perm: '0755'
   checksum_file: checksums/$(uname)-$(arch).sha256
+  os:
+    Linux: linux
+    Darwin: darwin
+  arch:
+    x86_64: amd64
+    aarch64: arm64
   pre_command: |
     if [ "${checksum_failed:-true}" = true ]; then
       rm -f ${dest}/${utility}
@@ -62,9 +68,6 @@ utility:
     download: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v${version}/cyclonedx-${os}-${arch}
   docker-compose:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
     arch:
       arm64: aarch64
     download: https://github.com/docker/compose/releases/download/v${version}/docker-compose-${os}-${arch}
@@ -77,9 +80,6 @@ utility:
     os:
       Linux: linux
       Darwin: macOS
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     extension:
       default: tar.gz
       macOS: zip
@@ -107,20 +107,11 @@ utility:
     os:
       Linux: linux
       Darwin: alpha-darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     # Mac OS is alpha and Mac only supports AMD64.  Linux supports arm and AMD64
     only: "[ ! ${os} = alpha-darwin ] || [ ${arch} = amd64 ]"
     download: https://github.com/goss-org/goss/releases/download/v${version}/goss-${os}-${arch}
   helm:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     download: https://get.helm.sh/helm-v${version}-${os}-${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner --strip-components=1 ${os}-${arch}/helm
   jq:
@@ -132,68 +123,27 @@ utility:
     download: https://github.com/stedolan/jq/releases/download/jq-${version}/jq-${os}
   kubeconform:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   kubectl:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     download: https://dl.k8s.io/release/v${version}/bin/${os}/${arch}/kubectl
   kubeval:
     <<: *defaults
     only: "[ ${arch} = amd64 ]"
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
     download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
   kustomize:
     <<: *defaults
     download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
   minikube:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     download: https://github.com/kubernetes/minikube/releases/download/v${version}/minikube-${os}-${arch}
   saml2aws:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
     download: https://github.com/Versent/saml2aws/releases/download/v${version}/saml2aws_${version}_${os}_${arch}.tar.gz
   yq:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: darwin
-    arch:
-      x86_64: amd64
-      aarch64: arm64
     download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}
