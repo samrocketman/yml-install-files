@@ -13,6 +13,13 @@ utility:
       if [ -n "${skip_checksum:-}" ]; then
         exit
       fi
+      if [ "${checksum_failed:-true}" = true ]; then
+        if [ -f /tmp/maven.tar.gz ]; then
+          exit 6
+        else
+          exit 1
+        fi
+      fi
       cd scratch
       tar -xzf /tmp/maven.tar.gz
       ln -s apache-maven-"${version}" apache-maven
