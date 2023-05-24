@@ -1,9 +1,15 @@
 # download-utilities v2.4
 
+Features
+- :fire: Support `exit 6` will immediately retry without failure count.  For
+  example, this can be use to run `rvm-installer` after some edits were made.
+- `post_command` now runs immediately after download; before checksumming.
+
+Other:
+
 - DRY up `download-utilities.yml` with `os` and `arch` defaults.
 - Add `docker-buildx` to examples.
 - Add `rvm-installer` to examples.
-- `post_command` now runs immediately after download; before checksumming.
 
 # download-utilities v2.3
 

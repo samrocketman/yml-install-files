@@ -74,6 +74,7 @@ utility:
       rm "${dest}/${utility}".bak
       sed -i.bak -e 's/archive\//archive\/refs\/tags\//g' "${dest}/${utility}"
       rm "${dest}/${utility}".bak
+      exit 6
   cyclonedx:
     <<: *defaults
     os:

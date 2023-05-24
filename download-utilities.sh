@@ -399,6 +399,9 @@ download_command() {
       if [ "$rcode" = 5 ]; then
         exit "$rcode"
       fi
+      if [ "$rcode" = 6 ]; then
+        continue
+      fi
       ((current = current+1))
       if [ "$current" -gt "$limit" ]; then
         echo 'RETRY limit reached.' >&2

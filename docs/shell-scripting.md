@@ -47,9 +47,17 @@ Static text fields (no shell scripting or substitution available).
 If you wish to abort any retry logic and immediately force-exit the script
 non-zero, then you should return an exit code 5.
 
-For example,
+For example, the following will permanently exit the download process.
 
     exit 5
+
+If you wish to retry an action even though it would otherwise succeed due to
+checksum you can skip the retry counter with exit code 6.
+
+For example, the following will exit and a checksum/download will immediately
+retry without a retry delay and does not count as a retry on failure.
+
+    exit 6
 
 ### Scripting environment variables
 
@@ -70,6 +78,26 @@ for the downloaded utility.
 
 - `pre_command` executes immediately before download for potential setup.
 - `post_command` executes immediately after download before checksumming.
+
+You can run commands with or without a validated checksum.  Here's a
+`post_command` script illustrating how to do this.
+
+```yaml
+post_command: |
+  if [ "${checksum_failed:-true}" = true ]; then
+    # run some commands here and then retry the checksum before running any more
+    # commands
+
+    # immediately loop again and rerun this post-download script after another
+    # checksum validation.
+    exit 6
+  else
+    # these commands will run only on successful download and guarantee the
+    # script being executed has been validated.  Commands running here, if
+    # running the downloaded utility, can be considered more trusted because the
+    # desired checksum has passed validation.
+  fi
+```
 
 ### Downloading
 
