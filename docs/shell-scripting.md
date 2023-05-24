@@ -68,8 +68,8 @@ The following variables are supported and not otherwise documented.
 `pre_command` and `post_command` will always execute even if the checksum passes
 for the downloaded utility.
 
-`pre_command` and `post_command` are executed as normal stand alone scripts
-before or after download.
+- `pre_command` executes immediately before download for potential setup.
+- `post_command` executes immediately after download before checksumming.
 
 ### Downloading
 

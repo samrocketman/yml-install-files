@@ -234,6 +234,9 @@ download_utility() (
       read_yaml "$@" default_download_extract env_shell || return $?
     fi
   fi
+  if [ -n "${post_command:-}" ]; then
+    read_yaml "$@" post_command shell || return $?
+  fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ] &&
     [ "${checksum_failed:-}" = true ]; then
     return 1
@@ -243,9 +246,6 @@ download_utility() (
   fi
   if [ -n "${owner:-}" ]; then
       echo "chown '${owner}' '${dest}/$2'" | eval_shell || return $?
-  fi
-  if [ -n "${post_command:-}" ]; then
-    read_yaml "$@" post_command shell || return $?
   fi
 )
 

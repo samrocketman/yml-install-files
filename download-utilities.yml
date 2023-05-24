@@ -64,7 +64,7 @@ utility:
     download: https://github.com/rvm/rvm/archive/refs/tags/${version}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner --strip-components=2 rvm-${version}/binscripts/${utility}
     post_command: |
-      if [ -n "${checksum_failed:-}" -a "${checksum_failed:-true}" = false ]; then
+      if [ "${checksum_failed:-true}" = false ]; then
         exit
       fi
       # can be swapped out with a GitHub release proxy
