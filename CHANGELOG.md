@@ -2,7 +2,8 @@
 
 Features
 - :fire: Support `exit 6` will immediately retry without failure count.  For
-  example, this can be use to run `rvm-installer` after some edits were made.
+  example, this can be use to run `rvm-installer` after some edits were made and
+  checksums of edits are validated.
 - `post_command` now runs immediately after download; before checksumming.
 
 Other:
