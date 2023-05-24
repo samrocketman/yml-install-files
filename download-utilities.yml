@@ -59,22 +59,6 @@ defaults: &defaults
   # pre_command: shell scripting available
   # post_command: shell scripting available
 utility:
-  rvm-installer:
-    <<: *defaults
-    download: https://github.com/rvm/rvm/archive/refs/tags/${version}.tar.gz
-    extract: tar -xzC ${dest}/ --no-same-owner --strip-components=2 rvm-${version}/binscripts/${utility}
-    post_command: |
-      if [ "${checksum_failed:-true}" = false ]; then
-        exit
-      fi
-      # can be swapped out with a GitHub release proxy
-      # escape forward slashes
-      base='github.com\/rvm\/rvm'
-      sed -i.bak -e 's/\( *\)DEFAULT_SOURCES=(github.com.*/\1DEFAULT_SOURCES=('"${base}"')/' "${dest}/${utility}"
-      rm "${dest}/${utility}".bak
-      sed -i.bak -e 's/archive\//archive\/refs\/tags\//g' "${dest}/${utility}"
-      rm "${dest}/${utility}".bak
-      exit 6
   cyclonedx:
     <<: *defaults
     os:
@@ -164,6 +148,22 @@ utility:
   minikube:
     <<: *defaults
     download: https://github.com/kubernetes/minikube/releases/download/v${version}/minikube-${os}-${arch}
+  rvm-installer:
+    <<: *defaults
+    download: https://github.com/rvm/rvm/archive/refs/tags/${version}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner --strip-components=2 rvm-${version}/binscripts/${utility}
+    post_command: |
+      if [ "${checksum_failed:-true}" = false ]; then
+        exit
+      fi
+      # can be swapped out with a GitHub release proxy
+      # escape forward slashes
+      base='github.com\/rvm\/rvm'
+      sed -i.bak -e 's/\( *\)DEFAULT_SOURCES=(github.com.*/\1DEFAULT_SOURCES=('"${base}"')/' "${dest}/${utility}"
+      rm "${dest}/${utility}".bak
+      sed -i.bak -e 's/archive\//archive\/refs\/tags\//g' "${dest}/${utility}"
+      rm "${dest}/${utility}".bak
+      exit 6
   saml2aws:
     <<: *defaults
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
