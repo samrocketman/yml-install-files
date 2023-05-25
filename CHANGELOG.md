@@ -7,6 +7,7 @@ Bugfix:
 Other:
 
 - Add `gitleaks` utility.
+- Document installation ordering.
 
 # download-utilities v2.4
 

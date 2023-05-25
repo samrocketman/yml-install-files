@@ -1,5 +1,12 @@
 # Some YAML examples
 
+# Ordering
+
+The `versions` key at the top of the file in the spec is typically sorted.  The
+`utility` section executes in order from top to bottom.  So if you need
+utilities installed as a prerequisite before others, then be sure to put it
+higher in the order.
+
 ### Downloading versions
 
 If you specify `update` without specifying `version`, then the latest version
