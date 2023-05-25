@@ -1,4 +1,4 @@
-daca87f008073ea9f1773cdaf9e30f30f06d92596928a456dd8153f0d1425516  ./scratch/rvm-installer
+6dcea24ca208667babadbd043f89b2c427d72d7cf2e8e80783193ec0a751aed1  ./scratch/gitleaks
 e781d32266ec89cb2c477f27c399f022f420db2e2b595818087e1d5bccbff9d4  ./scratch/cyclonedx
 a60d2dfb46cbe66e7fa75c8fd4fc730bcf052e08b8e236df254c24600db388a9  ./scratch/docker-buildx
 6d1784542f74806ef0ed4e798d31c91604453eb06b86448b4c60d7df5d5b7afb  ./scratch/docker-compose
@@ -11,5 +11,6 @@ a94a691ac56cd8ccdeb0d65043f773b8fc9f80ecc71f6a96ae1e4b6fbec5e1b7  ./scratch/helm
 1b0966692e398efe71fe59f913eaec44ffd4468cc1acd00bf91c29fa8ff8f578  ./scratch/kubectl
 af85a5f399e030415890f6a51cac06670194eec1d02817f1e3246e36769a65d1  ./scratch/kustomize
 3addf91be8cf1cb460b856171d3621b8b2f4bc96254246c912aeb30671ac37b7  ./scratch/minikube
+daca87f008073ea9f1773cdaf9e30f30f06d92596928a456dd8153f0d1425516  ./scratch/rvm-installer
 b560eece7afc105da71fda197c971bde79bcb77a23e29d0e7a0231bae478715d  ./scratch/saml2aws
 c1410df7b1266d34a89a91dcfeaf8eb27cb1c3f69822d72040d167ec61917ba0  ./scratch/yq

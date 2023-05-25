@@ -5,6 +5,7 @@ versions:
   dumb-init: 1.2.5
   gh: 2.29.0
   gimme: master
+  gitleaks: 8.16.3
   goss: 0.3.22
   helm: 3.12.0
   jq: "1.6"
@@ -110,6 +111,13 @@ utility:
     <<: *defaults
     download: https://raw.githubusercontent.com/travis-ci/gimme/${version}/gimme
     update:
+  gitleaks:
+    <<: *defaults
+    arch:
+      x86_64: x64
+      aarch64: arm64
+    download: https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_${os}_${arch}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   goss:
     <<: *defaults
     os:
@@ -163,7 +171,9 @@ utility:
       rm "${dest}/${utility}".bak
       sed -i.bak -e 's/archive\//archive\/refs\/tags\//g' "${dest}/${utility}"
       rm "${dest}/${utility}".bak
-      exit 6
+      if [ -z "${skip_checksum:-}" ]; then
+        exit 6
+      fi
   saml2aws:
     <<: *defaults
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}

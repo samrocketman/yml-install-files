@@ -1,3 +1,13 @@
+# download-utilities v2.5
+
+Bugfix:
+
+- :bug: Fix `rvm-installer` bug where it can't checksum due to infinite loop.
+
+Other:
+
+- Add `gitleaks` utility.
+
 # download-utilities v2.4
 
 Features
