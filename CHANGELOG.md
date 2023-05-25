@@ -70,7 +70,7 @@ Bug fixes:
 
 Breaking changes:
 
-- `extension` is no longer a shell script.  It is referenced by OS or
+- :boom: `extension` is no longer a shell script.  It is referenced by OS or
   architecture and is just a static string.  This is due to new flexibility of
   referencing fields by OS and architecture.
 
