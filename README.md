@@ -26,6 +26,5 @@ tested.
 Running `download-utilities.sh` requires the following installed software:
 
 - Bash
-- coreutils (BSD or GNU)
-- curl (or user configurable to `wget`)
-- yq (auto downloads latest if not available)
+- (BSD, BusyBox, or GNU) coreutils; and curl or wget
+- yq (auto downloads latest if not available to `/tmp`)
