@@ -1,3 +1,11 @@
+# download-utilities v2.6
+
+Enhancement:
+
+- `only` condition will skip a utility before attempting to check for `update`
+  when no `version` is supplied.
+- `exit 7` will skip this utility and not retry further.
+
 # download-utilities v2.5
 
 Bugfix:

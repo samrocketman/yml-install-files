@@ -59,6 +59,11 @@ retry without a retry delay and does not count as a retry on failure.
 
     exit 6
 
+If you wish to skip downloading the utility, then exit code 7 will not attempt
+any further retries.
+
+    exit 7
+
 ### Scripting environment variables
 
 All support YAML fields show up as environment variables including variables

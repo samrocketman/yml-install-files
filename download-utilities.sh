@@ -171,7 +171,7 @@ setup_environment() {
   if [ -n "${only:-}" ]; then
     if ! read_yaml "$@" only shell; then
       echo "SKIP $2: because matching only: $only" >&2
-      return 6
+      return 7
     fi
   fi
 
@@ -396,6 +396,9 @@ download_command() {
       fi
       if [ "$rcode" = 6 ]; then
         continue
+      fi
+      if [ "$rcode" = 7 ]; then
+        break
       fi
       ((current = current+1))
       if [ "$current" -gt "$limit" ]; then
