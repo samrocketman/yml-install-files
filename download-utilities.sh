@@ -67,13 +67,7 @@ yq() (
 
 # $1=file $2=utility
 get_binary() (
-  setup_environment "$@"
-  if [ -n "${only:-}" ]; then
-    if ! read_yaml "$@" only shell; then
-      echo "SKIP $2: because matching only: $only" >&2
-      return
-    fi
-  fi
+  setup_environment "$@" || return $?
   echo "${dest}/${utility}"
 )
 
@@ -174,6 +168,18 @@ setup_environment() {
     default_eval_shell dest download extension extract only os owner perm \
     post_command pre_command update utility version
 
+  if [ -n "${only:-}" ]; then
+    if ! read_yaml "$@" only shell; then
+      echo "SKIP $2: because matching only: $only" >&2
+      return 6
+    fi
+  fi
+
+  if [ -z "${download:-}" ]; then
+    echo "ERROR: ${2}: no download URL specified." >&2
+    return 5
+  fi
+
   if [ "${desired_command:-}" = download ] && [ -z "${version:-}" ]; then
     version="$(get_latest_util_version "$@")" || return 5
   fi
@@ -182,19 +188,8 @@ setup_environment() {
 
 # $1=file $2=utility
 download_utility() (
-  setup_environment "$@" || return 5
+  setup_environment "$@" || return $?
 
-  if [ -z "${download:-}" ]; then
-    echo "SKIP ${2}: no download URL specified." >&2
-    return
-  fi
-
-  if [ -n "${only:-}" ]; then
-    if ! read_yaml "$@" only shell; then
-      echo "SKIP $2: because matching only: $only" >&2
-      return
-    fi
-  fi
   set_debug="set -euxo pipefail;"
   export checksum_failed
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
@@ -259,7 +254,7 @@ yq_confined_edit() (
 get_latest_util_version() (
   if [ -z "${update:-}" ]; then
     echo "ERROR: No version or update script available for ${utility}" >&2
-    return 1
+    return 5
   fi
   read_yaml "$@" update shell | tr -d '\r'
 )
