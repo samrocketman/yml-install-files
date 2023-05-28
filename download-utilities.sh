@@ -136,6 +136,8 @@ read_yaml() (
 
 # $1=file $2=utility
 setup_environment() {
+  declare -a args
+  args=( "$1" )
   if [ -z "${os:-}" ]; then
     os="$(uname)"
   fi
@@ -144,56 +146,67 @@ setup_environment() {
   fi
 
   # static variables
-  arch="$(yq -r ".utility.\"$2\".arch.${arch} // \"${arch}\"" "$1")"
-  os="$(yq -r ".utility.\"$2\".os.${os} // \"${os}\"" "$1")"
-  version="$(yq -r ".versions.\"$2\" // .utility.\"$2\".version // \"\"" "$1")"
-  utility="$2"
+  if grep -F = <<< "$2" &> /dev/null; then
+    version="${2##*=}"
+    utility="${2%%=*}"
+    if [ "${version:-}" = latest ]; then
+      unset version
+    fi
+  else
+    version="$(yq -r ".versions.\"$2\" // .utility.\"$2\".version // \"\"" "$1")"
+    utility="$2"
+  fi
+  arch="$(yq -r ".utility.\"${utility}\".arch.${arch} // \"${arch}\"" "$1")"
+  os="$(yq -r ".utility.\"${utility}\".os.${os} // \"${os}\"" "$1")"
+
+  args+=( "$utility" )
 
   # variables referenced by OS or architecture
-  checksum_file="$(read_yaml "$@" checksum_file none)"
-  default_download="$(read_yaml "$@" default_download none)"
-  default_download_extract="$(read_yaml "$@" default_download_extract none)"
-  default_eval_shell="$(read_yaml "$@" default_eval_shell none)"
-  dest="$(read_yaml "$@" dest none)"
-  download="$(read_yaml "$@" download none)"
-  extension="$(read_yaml "$@" extension none)"
-  extract="$(read_yaml "$@" extract none)"
-  only="$(read_yaml "$@" only none)"
-  owner="$(read_yaml "$@" owner none)"
-  perm="$(read_yaml "$@" perm none)"
-  post_command="$(read_yaml "$@" post_command none)"
-  pre_command="$(read_yaml "$@" pre_command none)"
-  update="$(read_yaml "$@" update none)"
+  checksum_file="$(read_yaml "${args[@]}" checksum_file none)"
+  default_download="$(read_yaml "${args[@]}" default_download none)"
+  default_download_extract="$(read_yaml "${args[@]}" default_download_extract none)"
+  default_eval_shell="$(read_yaml "${args[@]}" default_eval_shell none)"
+  dest="$(read_yaml "${args[@]}" dest none)"
+  download="$(read_yaml "${args[@]}" download none)"
+  extension="$(read_yaml "${args[@]}" extension none)"
+  extract="$(read_yaml "${args[@]}" extract none)"
+  only="$(read_yaml "${args[@]}" only none)"
+  owner="$(read_yaml "${args[@]}" owner none)"
+  perm="$(read_yaml "${args[@]}" perm none)"
+  post_command="$(read_yaml "${args[@]}" post_command none)"
+  pre_command="$(read_yaml "${args[@]}" pre_command none)"
+  update="$(read_yaml "${args[@]}" update none)"
   export arch checksum_file default_download default_download_extract \
     default_eval_shell dest download extension extract only os owner perm \
     post_command pre_command update utility version
 
   if [ -n "${only:-}" ]; then
-    if ! read_yaml "$@" only shell; then
-      echo "SKIP $2: because matching only: $only" >&2
+    if ! read_yaml "${args[@]}" only shell; then
+      echo "SKIP ${utility}: because matching only: $only" >&2
       return 7
     fi
   fi
 
   if [ -z "${download:-}" ]; then
-    echo "ERROR: ${2}: no download URL specified." >&2
+    echo "ERROR: ${utility}: no download URL specified." >&2
     return 5
   fi
 
   if [ "${desired_command:-}" = download ] && [ -z "${version:-}" ]; then
-    version="$(get_latest_util_version "$@")" || return 5
+    version="$(get_latest_util_version "${args[@]}")" || return 5
   fi
-
 }
 
 # $1=file $2=utility
 download_utility() (
   setup_environment "$@" || return $?
+  declare -a args
+  args=( "$1" "${utility}" )
 
   set_debug="set -euxo pipefail;"
   export checksum_failed
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
-    checksum_file="$(read_yaml "$@" checksum_file env)"
+    checksum_file="$(read_yaml "${args[@]}" checksum_file env)"
     checksum_failed=true
     if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
       if grep -F / > /dev/null <<< "$1"; then
@@ -213,7 +226,7 @@ download_utility() (
     # checksum failed
   fi
   if [ -n "${pre_command:-}" ]; then
-    read_yaml "$@" pre_command shell || return $?
+    read_yaml "${args[@]}" pre_command shell || return $?
   fi
   if [ ! -d "${dest}" ]; then
     echo "ERROR: '${dest}' must exist as a directory and does not." >&2
@@ -224,23 +237,23 @@ download_utility() (
   if [ "${checksum_failed:-true}" = true ]; then
     if [ -z "${extract:-}" ]; then
       # non-extracting direct download utilities
-      read_yaml "$@" default_download env_shell || return $?
+      read_yaml "${args[@]}" default_download env_shell || return $?
     else
-      read_yaml "$@" default_download_extract env_shell || return $?
+      read_yaml "${args[@]}" default_download_extract env_shell || return $?
     fi
   fi
   if [ -n "${post_command:-}" ]; then
-    read_yaml "$@" post_command shell || return $?
+    read_yaml "${args[@]}" post_command shell || return $?
   fi
   if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ] &&
     [ "${checksum_failed:-}" = true ]; then
     return 1
   fi
   if [ -n "${perm:-}" ]; then
-    echo "chmod '${perm}' '${dest}/$2'" | eval_shell || return $?
+    echo "chmod '${perm}' '${dest}/${utility}'" | eval_shell || return $?
   fi
   if [ -n "${owner:-}" ]; then
-      echo "chown '${owner}' '${dest}/$2'" | eval_shell || return $?
+      echo "chown '${owner}' '${dest}/${utility}'" | eval_shell || return $?
   fi
 )
 
@@ -463,6 +476,10 @@ process_args() {
           yaml_file="$1"
           shift
         else
+          if [ -z "${skip_checksum:-}" ] && grep -F = <<< "$1" &> /dev/null; then
+            echo 'Set skip_checksum=1 because requesting custom version.' >&2
+            export skip_checksum=1
+          fi
           subcommand+=( "$1" )
           shift
         fi

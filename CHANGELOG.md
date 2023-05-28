@@ -2,7 +2,11 @@
 
 Feature:
 
-- Optionally specify installing multiple utilities instead of one.
+- :fire: Optionally specify installing utilities with a specific version or the
+  latest version ignoring the `version` and `checksum_file` for the requested
+  utility.
+- Optionally specify installing multiple utilities instead of one.  This
+  includes specifying versions of each utility.
 
 # download-utilities v2.6
 

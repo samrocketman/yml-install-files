@@ -47,6 +47,23 @@ Specify multiple utilities with one command.
 ./download-utilities.sh download-utilities.yml goss yq
 ```
 
+### Specify versions
+
+You can download individual utilities and specify specific versions.  This will
+ignore configured versions or checksums.
+
+```bash
+./download-utilities.sh download-utilities.yml yq=4.33.2 dumb-init=1.2.2
+```
+
+You can ignore configured versions and checksums to request the latest version.
+This will use the `update` field to check for the latest version and proceed to
+download it.
+
+```bash
+./download-utilities.sh download-utilities.yml yq=latest dumb-init=latest
+```
+
 ### Checksum utilities
 
 Checksum files are meant for validating downloads from the internet.  A checksum
