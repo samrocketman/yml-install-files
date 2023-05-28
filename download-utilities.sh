@@ -67,7 +67,13 @@ yq() (
 
 # $1=file $2=utility
 get_binary() (
-  setup_environment "$@" || return $?
+  if ! setup_environment "$@"; then
+    retcode=$?
+    if [ "$retcode" = 7 ]; then
+      return
+    fi
+    return "$retcode"
+  fi
   echo "${dest}/${utility}"
 )
 

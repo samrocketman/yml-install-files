@@ -4,7 +4,7 @@ versions:
   docker-compose: 2.18.1
   dumb-init: 1.2.5
   gh: 2.29.0
-  gimme: master
+  gimme: 1.5.5
   gitleaks: 8.16.3
   goss: 0.3.22
   helm: 3.12.0
@@ -109,8 +109,8 @@ utility:
     download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
   gimme:
     <<: *defaults
-    download: https://raw.githubusercontent.com/travis-ci/gimme/${version}/gimme
-    update:
+    download: https://github.com/travis-ci/gimme/archive/refs/tags/v${version}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner --strip-components=1 gimme-${version}/${utility}
   gitleaks:
     <<: *defaults
     arch:
@@ -136,7 +136,7 @@ utility:
     os:
       Linux: linux64
       Darwin: osx-amd64
-    download: https://github.com/stedolan/jq/releases/download/jq-${version}/jq-${os}
+    download: https://github.com/jqlang/jq/releases/download/jq-${version}/jq-${os}
   kubeconform:
     <<: *defaults
     download: https://github.com/yannh/kubeconform/releases/download/v${version}/kubeconform-${os}-${arch}.tar.gz
