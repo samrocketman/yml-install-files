@@ -1,3 +1,15 @@
+# download-utilities v2.8
+
+Bugfix:
+
+- :boom: Major fix `--checksum` command erroring out when skipping utilities
+  while performing utility checksums.
+
+Other:
+
+- Update jq download for its new organization.
+- Migrate gimme download to use GitHub release archive instead of master branch.
+
 # download-utilities v2.7
 
 Feature:
