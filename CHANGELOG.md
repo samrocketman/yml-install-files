@@ -1,3 +1,9 @@
+# download-utilities v2.7
+
+Feature:
+
+- Optionally specify installing multiple utilities instead of one.
+
 # download-utilities v2.6
 
 Enhancement:

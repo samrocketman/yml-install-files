@@ -380,16 +380,18 @@ EOF
 }
 
 download_command() {
+  local yaml_file="$1"
+  shift
   (
-    if [ -n "${2:-}" ]; then
-      echo "$2"
+    if [ "$#" -gt 0 ]; then
+      echo "$@" | xargs -n1
     else
-      yq -r '.utility | keys | .[]' "$1"
+      yq -r '.utility | keys | .[]' "$yaml_file"
     fi
   ) | while read -er util; do
     limit=6
     current=0
-    until download_utility "$1" "$util"; do
+    until download_utility "$yaml_file" "$util"; do
       rcode="$?"
       if [ "$rcode" = 5 ]; then
         exit "$rcode"
@@ -418,11 +420,13 @@ download_command() {
 
 checksum_command() {
   export skip_checksum=1
+  local yaml_file="$1"
+  shift
   (
-    if [ -n "${2:-}" ]; then
-      echo "$2"
+    if [ "$#" -gt 0 ]; then
+      echo "$@" | xargs -n1
     else
-      yq -r '.utility | keys | .[]' "$1"
+      yq -r '.utility | keys | .[]' "$yaml_file"
     fi
   ) | while read -er util; do
     get_binary "$yaml_file" "$util"
@@ -432,7 +436,7 @@ checksum_command() {
 update_command() {
   touch "$TMP_DIR/versions.yml"
 
-  yq -r '.utility | keys | .[]' "$1" | (LC_ALL=C sort;) | \
+  yq -r '.utility | keys | .[]' "$yaml_file" | (LC_ALL=C sort;) | \
   while read -er util; do
     get_update "$1" "$util"
   done
@@ -459,7 +463,7 @@ process_args() {
           yaml_file="$1"
           shift
         else
-          subcommand="$1"
+          subcommand+=( "$1" )
           shift
         fi
         ;;
@@ -468,6 +472,8 @@ process_args() {
 }
 
 export yaml_file
+declare -a subcommand
+
 process_args "$@"
 if [ -z "${yaml_file:-}" ]; then
   yaml_file="${default_yaml:-}"
@@ -478,14 +484,15 @@ trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
 check_yaml "$yaml_file"
 
+
 case "${desired_command}" in
   checksum)
-    checksum_command "$yaml_file" "${subcommand:-}"
+    checksum_command "$yaml_file" "${subcommand[@]}"
     ;;
   download)
-    download_command "$yaml_file" "${subcommand:-}"
+    download_command "$yaml_file" "${subcommand[@]}"
     ;;
   update)
-    update_command "$yaml_file" "${subcommand:-}"
+    update_command "$yaml_file" "${subcommand[@]}"
     ;;
 esac

@@ -41,6 +41,12 @@ initial testing.
 ./download-utilities.sh download-utilities.yml goss
 ```
 
+Specify multiple utilities with one command.
+
+```bash
+./download-utilities.sh download-utilities.yml goss yq
+```
+
 ### Checksum utilities
 
 Checksum files are meant for validating downloads from the internet.  A checksum
