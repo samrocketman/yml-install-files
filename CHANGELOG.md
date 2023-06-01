@@ -2,9 +2,10 @@
 
 Bugfix:
 
+- :boom: Unbound variable error when `download-utilities.sh` is called with no
+  arguments.
 - Ignore non-zero exit codes and always check for updates when calling
   `--update` command.
-- Unbound variable error when called with no arguments.
 
 Other:
 
