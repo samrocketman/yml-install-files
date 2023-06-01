@@ -27,7 +27,7 @@ set -euo pipefail
 }
 
 
-if [ ! "$(uname)" = Linux ]; then
+if [ "${1:-}" = docker ]; then
   docker build -t update -f checksums/Dockerfile checksums
   docker run -it --rm
     -u "$(id -u):$(id -g)" \

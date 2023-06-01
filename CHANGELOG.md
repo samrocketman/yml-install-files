@@ -9,6 +9,7 @@ Bugfix:
 Other:
 
 - Add `crane` OCI utility.
+- Add `kind` k8s utility.
 - Upgrade `gh` CLI.
 
 # download-utilities v2.8
