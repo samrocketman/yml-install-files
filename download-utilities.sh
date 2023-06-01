@@ -507,15 +507,20 @@ trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
 
 check_yaml "$yaml_file"
 
+declare -a args
+args=( "$yaml_file" )
+if [ -n "${subcommand[@]-}" ]; then
+  args+=( "${subcommand[@]}" )
+fi
 
 case "${desired_command}" in
   checksum)
-    checksum_command "$yaml_file" "${subcommand[@]}"
+    checksum_command "${args[@]}"
     ;;
   download)
-    download_command "$yaml_file" "${subcommand[@]}"
+    download_command "${args[@]}"
     ;;
   update)
-    update_command "$yaml_file" "${subcommand[@]}"
+    update_command "${args[@]}"
     ;;
 esac

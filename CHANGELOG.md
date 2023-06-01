@@ -1,3 +1,9 @@
+# download-utilities v2.9
+
+Bugfix:
+
+- Unbound variable error when called with no arguments.
+
 # download-utilities v2.8
 
 Bugfix:
