@@ -1,9 +1,10 @@
 versions:
+  crane: 0.15.2
   cyclonedx: 0.24.2
   docker-buildx: 0.10.5
   docker-compose: 2.18.1
   dumb-init: 1.2.5
-  gh: 2.29.0
+  gh: 2.30.0
   gimme: 1.5.5
   gitleaks: 8.16.3
   goss: 0.3.22
@@ -60,6 +61,15 @@ defaults: &defaults
   # pre_command: shell scripting available
   # post_command: shell scripting available
 utility:
+  crane:
+    <<: *defaults
+    # Darwin and Linux
+    os:
+    # x86_64 and arm64
+    arch:
+      aarch64: arm64
+    download: https://github.com/google/go-containerregistry/releases/download/v${version}/go-containerregistry_${os}_${arch}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   cyclonedx:
     <<: *defaults
     os:
