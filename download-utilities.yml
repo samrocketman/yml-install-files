@@ -6,6 +6,7 @@ versions:
   dumb-init: 1.2.5
   gh: 2.30.0
   gimme: 1.5.5
+  git-idm: 946120be3235c6e174d0902e0aa6d4f45afc89aa
   gitleaks: 8.16.3
   goss: 0.3.22
   helm: 3.12.0
@@ -122,6 +123,12 @@ utility:
     <<: *defaults
     download: https://github.com/travis-ci/gimme/archive/refs/tags/v${version}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner --strip-components=1 gimme-${version}/${utility}
+  git-idm:
+    <<: *defaults
+    download: https://raw.githubusercontent.com/samrocketman/git-identity-manager/${version}/git-idm
+    update: >
+      git ls-remote https://github.com/samrocketman/git-identity-manager.git |
+      awk '$2 == "refs/heads/main" {print $1;exit}'
   gitleaks:
     <<: *defaults
     arch:
