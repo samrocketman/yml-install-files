@@ -280,7 +280,8 @@ get_latest_util_version() (
 
 # $1=file $2=utility
 get_update() (
-  setup_environment "$@"
+  # ignore errors from environment setup; check for updates for all utilities
+  setup_environment "$@" &> /dev/null || true
   if [ -z "${update:-}" ]; then
     echo "SKIP ${2}: no update script." >&2
     yq_confined_edit ".versions.\"$2\" |= \"${version}\"" "$TMP_DIR/versions.yml"

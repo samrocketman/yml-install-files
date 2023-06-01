@@ -2,6 +2,8 @@
 
 Bugfix:
 
+- Ignore non-zero exit codes and always check for updates when calling
+  `--update` command.
 - Unbound variable error when called with no arguments.
 
 # download-utilities v2.8
