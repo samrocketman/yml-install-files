@@ -6,6 +6,11 @@ Bugfix:
   `--update` command.
 - Unbound variable error when called with no arguments.
 
+Other:
+
+- Add `crane` OCI utility.
+- Upgrade `gh` CLI.
+
 # download-utilities v2.8
 
 Bugfix:
