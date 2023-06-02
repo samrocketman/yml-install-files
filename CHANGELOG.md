@@ -5,6 +5,11 @@ Enhancement:
 - If the user has a hardened `/tmp` directory with noexec set, then offer an
   optional location via user configured environment variable `exec_tmp`.
 
+Other:
+
+- Add `git-idm` utility as an example downloading direct from a raw GitHub
+  commit.
+
 # download-utilities v2.9
 
 Bugfix:
