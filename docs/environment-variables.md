@@ -18,6 +18,7 @@ skip_checksum=''
 force_yq=''
 yq_mirror='https://github.com'
 yq_version=''
+exec_tmp=''
 ```
 
 Different variable defaults depending on existence of `curl`.
@@ -75,6 +76,9 @@ options modify the behavior.
   GitHub but without the GitHub domain.
 - `yq_version` - Specify a specific version of `yq` to self-bootstrap, instead
   of trying to download the latest release.
+- `exec_tmp` - If `/tmp` is mounted with noexec, then the user can provide an
+  optional location for downloading temporary executables.  A user-provided
+  `exec_temp` will not be subject to cleanup on exit.
 
 Variables which control how utilities and archives get downloaded.
 

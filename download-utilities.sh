@@ -355,6 +355,7 @@ check_yaml() (
   if ! type -P yq > /dev/null || [ -n "${force_yq:-}" ]; then
     if ! download_temp_yq; then
       echo 'ERROR: could not download a usable yq.' >&2
+      echo 'If you have a noexec /tmp, then set exec_tmp environment variable.' >&2
       result=1
     fi
   fi
@@ -503,8 +504,26 @@ if [ -z "${yaml_file:-}" ]; then
   yaml_file="${default_yaml:-}"
 fi
 
-export TMP_DIR="$(mktemp -d)"
-trap '[ ! -d "${TMP_DIR:-}" ] || rm -rf "${TMP_DIR:-}"' EXIT
+cleanup_on() (
+  if [ -n "${exec_tmp:-}" ]; then
+    return
+  fi
+  if [ -d "${TMP_DIR:-}" ]; then
+    rm -rf "${TMP_DIR}"
+  fi
+)
+
+export TMP_DIR
+if [ -n "${exec_tmp:-}" ]; then
+  if [ ! -d "${exec_tmp}" ]; then
+    echo 'exec_tmp must be a directory that exists.' >&2
+    exit 5
+  fi
+  TMP_DIR="$exec_tmp"
+else
+  TMP_DIR="$(mktemp -d)"
+fi
+trap cleanup_on EXIT
 
 check_yaml "$yaml_file"
 

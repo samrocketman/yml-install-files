@@ -1,3 +1,10 @@
+# download-utilities v2.10
+
+Enhancement:
+
+- If the user has a hardened `/tmp` directory with noexec set, then offer an
+  optional location via user configured environment variable `exec_tmp`.
+
 # download-utilities v2.9
 
 Bugfix:
