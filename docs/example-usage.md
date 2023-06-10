@@ -20,6 +20,12 @@ mkdir scratch
 The YAML file argument is optional if the current working directory has a file
 named `download-utilities.yml`.
 
+Reading from `stdin`.
+
+```bash
+./download-utilities.sh - < ./docs/examples/yq.yml
+```
+
 ### Alternate Downloads
 
 ```bash
