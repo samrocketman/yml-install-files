@@ -483,12 +483,6 @@ process_args() {
         if [ -z "${yaml_file:-}" ]; then
           yaml_file="$1"
           shift
-          
-          if [[ "${yaml_file}" == "-" ]]; then
-            temp_file=$(mktemp)
-            cat > "${temp_file}"
-            yaml_file=${temp_file}
-          fi
         else
           if [ -z "${skip_checksum:-}" ] && grep -F = <<< "$1" &> /dev/null; then
             echo 'Set skip_checksum=1 because requesting custom version.' >&2
@@ -530,6 +524,12 @@ else
   TMP_DIR="$(mktemp -d)"
 fi
 trap cleanup_on EXIT
+
+if [[ "${yaml_file}" == "-" ]]; then
+  temp_file=$(mktemp -p ${TMP_DIR})
+  cat > "${temp_file}"
+  yaml_file=${temp_file}
+fi
 
 check_yaml "$yaml_file"
 
