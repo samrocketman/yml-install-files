@@ -221,7 +221,7 @@ download_utility() (
     fi
     if [ ! -f "${checksum_file}" ]; then
       echo "ERROR: Checksum file '${checksum_file}' does not exist." >&2
-      return 1
+      return 5
     fi
     if grep -F "${dest}/${utility}" "${checksum_file}" | {
         eval "${default_verify_checksum}"
