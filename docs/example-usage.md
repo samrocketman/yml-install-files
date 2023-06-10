@@ -23,7 +23,11 @@ named `download-utilities.yml`.
 Reading from `stdin`.
 
 ```bash
+# download
 ./download-utilities.sh - < ./docs/examples/yq.yml
+
+# download and validate checksums
+./download-utilities.sh - < ./docs/examples/yq-checksum.yml
 ```
 
 ### Alternate Downloads

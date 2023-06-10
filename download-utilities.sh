@@ -169,6 +169,7 @@ setup_environment() {
 
   # variables referenced by OS or architecture
   checksum_file="$(read_yaml "${args[@]}" checksum_file none)"
+  checksum="$(read_yaml "${args[@]}" checksum none)"
   default_download="$(read_yaml "${args[@]}" default_download none)"
   default_download_extract="$(read_yaml "${args[@]}" default_download_extract none)"
   default_eval_shell="$(read_yaml "${args[@]}" default_eval_shell none)"
@@ -182,7 +183,7 @@ setup_environment() {
   post_command="$(read_yaml "${args[@]}" post_command none)"
   pre_command="$(read_yaml "${args[@]}" pre_command none)"
   update="$(read_yaml "${args[@]}" update none)"
-  export arch checksum_file default_download default_download_extract \
+  export arch checksum checksum_file default_download default_download_extract \
     default_eval_shell dest download extension extract only os owner perm \
     post_command pre_command update utility version
 
@@ -211,7 +212,16 @@ download_utility() (
 
   set_debug="set -euxo pipefail;"
   export checksum_failed
-  if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ]; then
+  if [ -n "${skip_checksum:-}" ]; then
+    true
+  elif [ -n "${checksum:-}" ]; then
+    checksum_failed=true
+    if echo "${checksum}  ${dest}/${utility}" | \
+      eval "${default_verify_checksum}"; then
+      # checksum success
+      checksum_failed=false
+    fi
+  elif [ -n "${checksum_file:-}" ]; then
     checksum_file="$(read_yaml "${args[@]}" checksum_file env)"
     checksum_failed=true
     if ! grep '^/' > /dev/null <<< "${checksum_file}"; then

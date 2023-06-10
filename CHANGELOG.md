@@ -3,6 +3,7 @@
 Enhancement:
 
 - :fire: Support for reading YAML from `stdin` by @seanly.  See [PR #1][#1].
+- Support for validating checksums from YAML files provided through stdin.
 
 Bug fixes:
 
