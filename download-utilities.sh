@@ -526,9 +526,9 @@ fi
 trap cleanup_on EXIT
 
 if [[ "${yaml_file}" == "-" ]]; then
-  temp_file=$(mktemp -p ${TMP_DIR})
+  temp_file="$(mktemp -p "${TMP_DIR}")"
   cat > "${temp_file}"
-  yaml_file=${temp_file}
+  yaml_file="${temp_file}"
 fi
 
 check_yaml "$yaml_file"
