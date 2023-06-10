@@ -1,3 +1,15 @@
+# download-utilities v2.11
+
+Enhancement:
+
+- :fire: Support for reading YAML from `stdin` by @seanly.  See [PR #1][#1].
+
+Bug fixes:
+
+- Exit `download-utilities.sh` when a declared checksum file does not exist.
+
+[#1]: https://github.com/samrocketman/yml-install-files/pull/1
+
 # download-utilities v2.10
 
 Enhancement:
