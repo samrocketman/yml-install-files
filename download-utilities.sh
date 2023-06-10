@@ -525,6 +525,11 @@ else
 fi
 trap cleanup_on EXIT
 
+if [[ "${yaml_file}" == "-" ]]; then
+  yaml_file="$(mktemp -p "${TMP_DIR}")"
+  cat > "${yaml_file}"
+fi
+
 check_yaml "$yaml_file"
 
 declare -a args
