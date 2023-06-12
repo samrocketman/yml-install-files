@@ -11,6 +11,10 @@ Bugfix:
 
 - stdin YAML did not work on Mac.
 
+Other:
+
+- Upgraded utilities `gitleaks`, `goss`, and `kubconform`.
+
 # download-utilities v2.11
 
 Enhancement:
