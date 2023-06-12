@@ -1,3 +1,16 @@
+# download-utilities v2.12
+
+Enhancement:
+
+- :fire: Any utility can be organized top-level as a pluralized setting.
+- Documentation improvements.
+- `version` and `versions` (top level) now support specifying different versions
+  by architecture and OS as an option.
+
+Bugfix:
+
+- stdin YAML did not work on Mac.
+
 # download-utilities v2.11
 
 Enhancement:
