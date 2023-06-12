@@ -79,21 +79,33 @@ get_binary() (
 
 # $1=file $2=utility $3=field $4=one_of:[none, env, env_shell, shell]
 read_yaml_arch() (
-  byname=".utility.\"$2\".$3"
-  byos=".utility.\"$2\".$3.${os}"
-  byarch=".utility.\"$2\".$3.${os}.${arch}"
+  # by field is pluralized i.e. version becomes versions or checksum becomes
+  # checksums
+  by_field=".${3}s.\"$2\""
+  by_utility=".utility.\"$2\".$3"
+  by_os=".${os}"
+  by_arch="${by_os}.${arch}"
   if [ "$4" = none ] ||
     grep '^default_' <<< "$3" > /dev/null; then
     eval "default_val=\"\${${3}:-}\""
   fi
   yq -r \
-    "select(${byarch} | type == \"!!str\")${byarch} // \
-    select(${byos}.default | type == \"!!str\")${byos}.default // \
-    select(${byos} | type == \"!!str\")${byos} // \
-    select(${byname}.default | type == \"!!str\")${byname}.default.${arch} // \
-    select(${byname}.default | type == \"!!str\")${byname}.default // \
-    select(${byname} | type == \"!!str\")${byname} // \
-    \"${default_val:-}\"" \
+    " \
+    select(${by_field}${by_arch} | type == \"!!str\")${by_field}${by_arch} // \
+    select(${by_field}${by_os}.default | type == \"!!str\")${by_field}${by_os}.default // \
+    select(${by_field}${by_os} | type == \"!!str\")${by_field}${by_os} // \
+    select(${by_field}.default | type == \"!!str\")${by_field}.default.${arch} // \
+    select(${by_field}.default | type == \"!!str\")${by_field}.default // \
+    select(${by_field} | type == \"!!str\")${by_field} // \
+    \
+    select(${by_utility}${by_arch} | type == \"!!str\")${by_utility}${by_arch} // \
+    select(${by_utility}${by_os}.default | type == \"!!str\")${by_utility}${by_os}.default // \
+    select(${by_utility}${by_os} | type == \"!!str\")${by_utility}${by_os} // \
+    select(${by_utility}.default | type == \"!!str\")${by_utility}.default.${arch} // \
+    select(${by_utility}.default | type == \"!!str\")${by_utility}.default // \
+    select(${by_utility} | type == \"!!str\")${by_utility} // \
+    \"${default_val:-}\" \
+    " \
   "$1"
 )
 
@@ -159,7 +171,7 @@ setup_environment() {
       unset version
     fi
   else
-    version="$(yq -r ".versions.\"$2\" // .utility.\"$2\".version // \"\"" "$1")"
+    version="$(read_yaml "${args[@]}" "$2" version none)"
     utility="$2"
   fi
   arch="$(yq -r ".utility.\"${utility}\".arch.${arch} // \"${arch}\"" "$1")"

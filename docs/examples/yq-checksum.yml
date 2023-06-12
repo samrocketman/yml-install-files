@@ -1,14 +1,15 @@
 versions:
   yq: 4.34.1
+checksums:
+  yq:
+    linux:
+      amd64: c5a92a572b3bd0024c7b1fe8072be3251156874c05f017c23f9db7b3254ae71a
+      arm64: c1410df7b1266d34a89a91dcfeaf8eb27cb1c3f69822d72040d167ec61917ba0
+    darwin:
+      amd64: 25ccdecfd02aa37e07c985ac9612f17e5fd2c9eb40b051d43936bf3b99c9c2f5
+      arm64: 30e8c7c52647f26312d8709193a269ec0ba4f384712775f87241b2abdc46de85
 utility:
   yq:
-    checksum:
-      linux:
-        amd64: c5a92a572b3bd0024c7b1fe8072be3251156874c05f017c23f9db7b3254ae71a
-        arm64: c1410df7b1266d34a89a91dcfeaf8eb27cb1c3f69822d72040d167ec61917ba0
-      darwin:
-        amd64: 25ccdecfd02aa37e07c985ac9612f17e5fd2c9eb40b051d43936bf3b99c9c2f5
-        arm64: 30e8c7c52647f26312d8709193a269ec0ba4f384712775f87241b2abdc46de85
     download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}
     dest: ./scratch
     perm: '0755'

@@ -71,6 +71,54 @@ export skip_checksum=1
 unset skip_checksum
 ```
 
+### Top level fields vs utility fields
+
+Any field within utility (with exception for `os` and `arch`) can be a
+pluralized top level field organized by utility.  For example, if you have a
+utility with checksums listed the following way:
+
+```yaml
+utility:
+  my_file.tar.gz:
+    ...
+    checksum: # checksum
+  my_binary:
+    ...
+    checksum:
+      Linux:
+        x86_64: # checksum
+        aarch64: # checksum
+      Darwin:
+        x86_64: # checksum
+        arm64: # checksum
+```
+
+Then you can reorganize your YAML by making `checksum` a pluralized top-level
+field, `checksums`, like the following example.
+
+```yaml
+checksums:
+  my_file.tar.gz: # checksum
+  my_binary:
+    Linux:
+      x86_64: # checksum
+      aarch64: # checksum
+    Darwin:
+      x86_64: # checksum
+      arm64: # checksum
+utility:
+  my_binary:
+    ...
+```
+
+For an example, see [`yq-checksum.yml`][yq-checksum].
+
+The purpose of making this flexibility for any field is to better support the
+automation around generating custom `download-utilities.yml`.  For example, you
+might want to generate a file where the YAML can be read from `stdin`.  This
+makes it easier to write programs to generate top-level sections, instead of
+trying to edit the inner hierarchy of the YAML.
+
 ### Complex example
 
 A large and complex example which uses advanced features like YAML achors and
@@ -82,4 +130,5 @@ aliases can be found in the repository root:
 [cli]: examples/gh-cli.yml
 [dumb-init]: examples/dumb-init.yml
 [maven]: examples/maven.yml
+[yq-checksum]: examples/yq-checksum.yml
 [yq]: examples/yq.yml
