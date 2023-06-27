@@ -32,4 +32,4 @@ utility:
       export download extract
       # Do more advanced extraction outside of the eval via bash piped commands
       eval "${default_download_extract}" |
-      grep -o '3\.[.0-9]\+' | sort -Vr | head -n1
+      yq -p=xml '.metadata.versioning.versions[] | join("\n")' | grep -v -- - | sort -Vr | head -n1
