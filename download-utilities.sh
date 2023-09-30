@@ -410,6 +410,10 @@ Example usage:
       download-utilities.sh download-utilities.yml yq
 
 Optional Commands:
+  --yq
+      This is necessary if you are also installing yq via yaml.  This script
+      requires yq.  It will download yq to temporary space and use it.
+
   --download
       Downloads utilities from provided YAML.
 
@@ -494,6 +498,10 @@ process_args() {
   desired_command=download
   while [ $# -gt 0 ]; do
     case "$1" in
+      --yq)
+        export force_yq=1
+        shift
+        ;;
       --download|--checksum|--update)
         desired_command="${1#--}"
         shift
