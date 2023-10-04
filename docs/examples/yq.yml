@@ -1,5 +1,5 @@
 versions:
-  yq: 4.34.1
+  yq: 4.35.2
 utility:
   yq:
     download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}

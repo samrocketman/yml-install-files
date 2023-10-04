@@ -1,5 +1,5 @@
 versions:
-  maven.tar.gz: 3.9.2
+  maven.tar.gz: 3.9.4
 utility:
   maven.tar.gz:
     dest: /tmp
