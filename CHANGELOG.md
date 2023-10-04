@@ -1,3 +1,20 @@
+# download-utilities v2.13
+
+Reductions:
+
+- :warning: `kustomize` dropped MacOS arm64 binaries from releases in 5.1. See
+  [kustomize#5359][kustomize#5359]
+
+
+Enhancement:
+
+- new `--yq` option to self-bootstrap yq in addition to environment var
+  `force_yq`.
+- `goss` has left alpha for Mac OS builds.
+- `jq` is now available for Mac and Linux on amd64 and arm64.
+
+[kustomize#5359]: https://github.com/kubernetes-sigs/kustomize/issues/5359
+
 # download-utilities v2.12
 
 Enhancement:

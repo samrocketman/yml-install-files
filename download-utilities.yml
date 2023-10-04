@@ -1,25 +1,25 @@
 versions:
-  crane: 0.15.2
-  cyclonedx: 0.24.2
-  docker-buildx: 0.10.5
-  docker-compose: 2.18.1
+  crane: 0.16.1
+  cyclonedx: 0.25.0
+  docker-buildx: 0.11.2
+  docker-compose: 2.22.0
   dumb-init: 1.2.5
-  gh: 2.30.0
+  gh: 2.36.0
   gimme: 1.5.5
   git-idm: 946120be3235c6e174d0902e0aa6d4f45afc89aa
-  gitleaks: 8.16.4
-  goss: 0.3.23
-  helm: 3.12.0
-  jq: "1.6"
-  kind: 0.19.0
-  kubeconform: 0.6.2
-  kubectl: 1.27.2
+  gitleaks: 8.18.0
+  goss: 0.4.2
+  helm: 3.13.0
+  jq: "1.7"
+  kind: 0.20.0
+  kubeconform: 0.6.3
+  kubectl: 1.28.2
   kubeval: 0.16.1
-  kustomize: 5.0.3
-  minikube: 1.30.1
+  kustomize: 5.1.1
+  minikube: 1.31.2
   rvm-installer: 1.29.12
-  saml2aws: 2.36.8
-  yq: 4.34.1
+  saml2aws: 2.36.11
+  yq: 4.35.2
 
 
 defaults: &defaults
@@ -138,11 +138,6 @@ utility:
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   goss:
     <<: *defaults
-    os:
-      Linux: linux
-      Darwin: alpha-darwin
-    # Mac OS is alpha and Mac only supports AMD64.  Linux supports arm and AMD64
-    only: "[ ! ${os} = alpha-darwin ] || [ ${arch} = amd64 ]"
     download: https://github.com/goss-org/goss/releases/download/v${version}/goss-${os}-${arch}
   helm:
     <<: *defaults
@@ -150,11 +145,10 @@ utility:
     extract: tar -xzC ${dest}/ --no-same-owner --strip-components=1 ${os}-${arch}/helm
   jq:
     <<: *defaults
-    only: "[ ${arch} = amd64 ]"
     os:
-      Linux: linux64
-      Darwin: osx-amd64
-    download: https://github.com/jqlang/jq/releases/download/jq-${version}/jq-${os}
+      Linux: linux
+      Darwin: macos
+    download: https://github.com/jqlang/jq/releases/download/jq-${version}/jq-${os}-${arch}
   kind:
     <<: *defaults
     download: https://github.com/kubernetes-sigs/kind/releases/download/v0.19.0/kind-${os}-${arch}
@@ -172,6 +166,8 @@ utility:
     download: https://github.com/instrumenta/kubeval/releases/download/v${version}/kubeval-${os}-${arch}.tar.gz
   kustomize:
     <<: *defaults
+    # https://github.com/kubernetes-sigs/kustomize/issues/5359
+    only: "! ( [ ${os} = darwin ] && [ ${arch} = arm64 ]; )"
     download: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_${os}_${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   minikube:
