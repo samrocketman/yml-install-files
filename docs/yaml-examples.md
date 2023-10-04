@@ -119,6 +119,52 @@ might want to generate a file where the YAML can be read from `stdin`.  This
 makes it easier to write programs to generate top-level sections, instead of
 trying to edit the inner hierarchy of the YAML.
 
+### Redirect based on version number
+
+A utility of `type: redirect` can route to which utility definition should be
+used depending on the user-provided version number.
+
+```yaml
+  scala:
+    type: redirect
+    default_redirect: scala3
+    redirect:
+      scala3: 'echo ${version} | grep "^3"'
+      scala2: 'echo ${version} | grep "^2"'
+  scala3:
+    ...
+  scala2:
+    ...
+```
+
+For example, see [`scala.yml`][scala]
+
+If a user requests installation of a redirect utility like above, they can be
+directed to a different download location and extraction process depending on
+the range of versions available.  Some long-lasting utilities change processes
+
+For example, the following will download the `latest` scala3.
+
+```bash
+./download-utilities.sh --download docs/examples/scala.yml scala
+
+# alternate or redundant
+./download-utilities.sh --download docs/examples/scala.yml scala=latest
+```
+
+If a user requests version 3, they'll get routed to `scala3` utility download.
+
+```
+./download-utilities.sh --download docs/examples/scala.yml scala=3.3.1
+```
+
+If a user requests a version starting with 2, they'll get routed to `scala2`
+utility download.
+
+```
+./download-utilities.sh --download docs/examples/scala.yml scala=2.13.12
+```
+
 ### Complex example
 
 A large and complex example which uses advanced features like YAML achors and
@@ -130,5 +176,6 @@ aliases can be found in the repository root:
 [cli]: examples/gh-cli.yml
 [dumb-init]: examples/dumb-init.yml
 [maven]: examples/maven.yml
+[scala]: examples/scala.yml
 [yq-checksum]: examples/yq-checksum.yml
 [yq]: examples/yq.yml

@@ -26,6 +26,19 @@ utility:
     pre_command: # optional shell script run before download
     update: # utility script which prints latest version to stdout
     version: # a version number
+  # name of utility redirect whose purpose is to direct to other utils.  This is
+  # useful if there's drastic changes in downloads available between major
+  # releases of a given utility
+  utility_key2:
+    # required value for this type of utility
+    type: redirect
+    default_redirect: # redirect to another utility_key by default
+    # a list of utility keys.  The value of each utility is a script.  The first
+    # script which succeeds evaluation will be the utility definition chosen for
+    # downloading.  A redirect cannot point to another redirect.  If no script
+    # evaluations return true, then the default_redirect is the fallback.
+    redirect:
+      utility_key: # key name is another utility; value is a script to chose this utility
 ```
 
 ### Variables

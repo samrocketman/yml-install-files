@@ -21,6 +21,7 @@ The following fields support shell scripting as its value:
 - `only`
 - `post_command`
 - `pre_command`
+- `redirect` (specifically the child key values) if `type: redirect`
 - `update`
 
 The following fields allow shell substitution scripting.  Bash is used for
@@ -241,4 +242,12 @@ only: "[ ${arch} = x86_64 ]"
 > Note: the value of `${arch}` should be considered after variable translation.
 > This example assumes no translation.
 
+### `redirect` shell script
+
+This is an extremely early executing script.  The only field you can reliably
+check is the version number environment variable `${version}`.
+
+See [scala example][scala] which will redirect based on version number.
+
 [bash]: https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html
+[scala]: docs/examples/scala.yml
