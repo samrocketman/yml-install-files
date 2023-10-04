@@ -153,7 +153,49 @@ read_yaml() (
 )
 
 # $1=file $2=utility
+redirect_utility() {
+  # lists redirects
+  #yq '.utility.scala.redirect[] | key' download-utilities.yml
+  # get type value redirect or empty string
+  #yq '.utility.scala2.type // ""' download-utilities.yml
+  # get default redirect
+  #yq '.utility.scala.default_redirect // ""' download-utilities.yml
+
+  local by_util=".utility.\"$2\""
+
+  # get type if type redirect then
+  if [ ! redirect = "$(yq -r "select(${by_util}.type | type == \"!!str\")${by_util}.type // \"\"" "$1")" ]; then
+    return
+  fi
+
+  # default_redirect required; if empty then throw error else
+  local default_redirect="$(yq -r "select(${by_util}.default_redirect | type == \"!!str\")${by_util}.default_redirect // \"\"" "$1")"
+  if [ -z "${default_redirect:-}" ]; then
+    echo "Utility $2 is of type 'redirect' but does not have a 'default_redirect' set." >&2
+    exit 1
+  fi
+
+  local redirect_utils=( $(yq "${by_util}.redirect[] | key" "$1") )
+
+  # iterate each utility and find first match; then set utility variable
+  if [ -n "${redirect_utils:-}" ]; then
+    for nextutil in "${redirect_utils[@]}"; do
+      if yq "${by_util}.redirect.\"${nextutil}\"" "$1" | env_shell | eval_shell; then
+        utility="${nextutil}"
+        return
+      fi
+    done
+  fi
+
+  # if no matches found set utility variable to default_redirect
+  utility="${default_redirect}"
+}
+
+# $1=file $2=utility
 setup_environment() {
+  export arch checksum checksum_file default_download default_download_extract \
+    default_eval_shell dest download extension extract only os owner perm \
+    post_command pre_command update utility version
   declare -a args
   args=( "$1" )
   if [ -z "${os:-}" ]; then
@@ -174,6 +216,9 @@ setup_environment() {
     version="$(read_yaml "${args[@]}" "$2" version none)"
     utility="$2"
   fi
+  # update utility based on possible redirect
+  redirect_utility "$1" "$utility"
+
   arch="$(yq -r ".utility.\"${utility}\".arch.${arch} // \"${arch}\"" "$1")"
   os="$(yq -r ".utility.\"${utility}\".os.${os} // \"${os}\"" "$1")"
 
@@ -195,9 +240,6 @@ setup_environment() {
   post_command="$(read_yaml "${args[@]}" post_command none)"
   pre_command="$(read_yaml "${args[@]}" pre_command none)"
   update="$(read_yaml "${args[@]}" update none)"
-  export arch checksum checksum_file default_download default_download_extract \
-    default_eval_shell dest download extension extract only os owner perm \
-    post_command pre_command update utility version
 
   if [ -n "${only:-}" ]; then
     if ! read_yaml "${args[@]}" only shell; then

@@ -1,0 +1,33 @@
+utility:
+  scala:
+    type: redirect
+    default_redirect: scala3
+    redirect:
+      scala3: 'echo ${version} | grep "^3"'
+      scala2: 'echo ${version} | grep "^2"'
+  scala3:
+    dest: ./scratch
+    only: '[ ! -f "${dest}"/scala-env.sh ] || [ ! -d "${dest}/scala3-${version}" ]'
+    download: https://github.com/lampepfl/dotty/releases/download/${version}/scala3-${version}.tar.gz
+    extract: tar -xzC ${dest}/ --no-same-owner
+    post_command: |
+      cat > "${dest}/scala-env.sh" << EOF
+      export PROG_HOME="${dest}/scala3-${version}"
+      export SCALA_HOME="${dest}/scala3-${version}"
+      export PATH="${dest}/scala3-${version}/bin:${PATH}"
+      EOF
+    update: |
+      owner="$(awk -F/ '{print $4"/"$5}' <<< "${download}")"
+      export download=https://github.com/"${owner}"/releases/latest
+      eval "${default_download_head}" |
+      awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'
+  scala2:
+    dest: ./scratch
+    only: '[ ! -f "${dest}"/scala-env.sh ] || [ ! -d "${dest}/scala-${version}" ]'
+    download: https://downloads.lightbend.com/scala/${version}/scala-${version}.tgz
+    extract: tar -xzC ${dest}/ --no-same-owner
+    post_command: |
+      cat > "${dest}/scala-env.sh" << EOF
+      export SCALA_HOME="${dest}/scala-${version}"
+      export PATH="${dest}/scala3-${version}/bin:${PATH}"
+      EOF
