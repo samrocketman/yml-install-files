@@ -1,3 +1,11 @@
+# download-utilities v2.14
+
+Enhancement:
+
+- :fire: New YAML spec for redirecting where to download utilities based on
+  versions requested; because sometimes a project will change its hosting or
+  download syntax over time.
+
 # download-utilities v2.13
 
 Reductions:
