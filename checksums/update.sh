@@ -45,7 +45,7 @@ if git diff --quiet --exit-code download-utilities.yml && \
   exit
 fi
 
-update_arch Linux x86_64
-update_arch Linux aarch64
-update_arch Darwin x86_64
 update_arch Darwin arm64
+update_arch Darwin x86_64
+update_arch Linux aarch64
+update_arch Linux x86_64

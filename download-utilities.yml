@@ -1,4 +1,5 @@
 versions:
+  clair: 4.7.1
   crane: 0.16.1
   cyclonedx: 0.25.0
   docker-buildx: 0.11.2
@@ -63,6 +64,11 @@ defaults: &defaults
   # pre_command: shell scripting available
   # post_command: shell scripting available
 utility:
+  clair:
+    <<: *defaults
+    # not available on arm mac
+    only: "[ ${os} = linux ] || [ ${arch} = amd64 ]"
+    download: https://github.com/quay/clair/releases/download/v${version}/clairctl-${os}-${arch}
   crane:
     <<: *defaults
     # Darwin and Linux
