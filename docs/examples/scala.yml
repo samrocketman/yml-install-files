@@ -29,5 +29,5 @@ utility:
     post_command: |
       cat > "${dest}/scala-env.sh" << EOF
       export SCALA_HOME="${dest}/scala-${version}"
-      export PATH="${dest}/scala3-${version}/bin:${PATH}"
+      export PATH="${dest}/scala-${version}/bin:${PATH}"
       EOF
