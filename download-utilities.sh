@@ -1,5 +1,5 @@
 #!/bin/bash
-# download-utilities v2.14
+# download-utilities v2.15
 # Created by Sam Gleske
 # Fri 19 May 2023 06:01:53 PM EDT
 # MIT Licensed; https://github.com/samrocketman/yml-install-files
@@ -210,7 +210,7 @@ setup_environment() {
     version="${2##*=}"
     utility="${2%%=*}"
     if [ "${version:-}" = latest ]; then
-      unset version
+      version=""
     fi
   else
     version="$(read_yaml "${args[@]}" "$2" version none)"

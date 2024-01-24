@@ -1,3 +1,9 @@
+# download-utilities v2.15
+
+Bugfix:
+
+- :boom: Unbound variable error (no `version` set) when when installing a utility version with `=latest`.  Version was unset which cleared the export so it needed to be exported again after being set.
+
 # download-utilities v2.14
 
 Enhancement:
