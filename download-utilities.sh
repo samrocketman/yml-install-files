@@ -606,7 +606,7 @@ check_yaml "$yaml_file"
 
 declare -a args
 args=( "$yaml_file" )
-if [ -n "${subcommand[@]-}" ]; then
+if [ -n "${subcommand[*]-}" ]; then
   args+=( "${subcommand[@]}" )
 fi
 

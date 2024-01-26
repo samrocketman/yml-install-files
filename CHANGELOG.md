@@ -1,3 +1,14 @@
+# download-utilities v2.16
+
+Bugfix:
+
+- :boom: Requesting multiple specific versions from a single command was broken.
+
+Other:
+
+- Upgrade utilities in `download-utilities.yml` and `docs/examples`
+- Minor documentation fixes.
+
 # download-utilities v2.15
 
 Bugfix:
