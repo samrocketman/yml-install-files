@@ -250,4 +250,4 @@ check is the version number environment variable `${version}`.
 See [scala example][scala] which will redirect based on version number.
 
 [bash]: https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html
-[scala]: docs/examples/scala.yml
+[scala]: examples/scala.yml
