@@ -52,7 +52,7 @@ default_verify_checksum='sha256sum -c -'
 Misc options
 
 - `default_eval_shell` - YAML fields that support [shell
-  scripting](shell-scripting.md) our written to `stdin` of this varable.  You
+  scripting](shell-scripting.md) are written to `stdin` of this varable.  You
   can change this shell to something other than bash.
 
   ```bash
