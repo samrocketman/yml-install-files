@@ -38,7 +38,7 @@ defaults: &defaults
     if [ "${checksum_failed:-true}" = true ]; then
       rm -f ${dest}/${utility}
     fi
-  # Universal update; see gimme utility where update is overridden
+  # Universal update; see git-idm utility where update is overridden
   update: |
     case "${download}" in
       https://github.com/*)
