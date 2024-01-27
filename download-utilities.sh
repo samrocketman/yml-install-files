@@ -552,7 +552,7 @@ process_args() {
         help
         ;;
       *)
-        if [ -z "${yaml_file:-}" ]; then
+        if [ -z "${yaml_file:-}" ] && [ -e "$1" ]; then
           yaml_file="$1"
           shift
         else

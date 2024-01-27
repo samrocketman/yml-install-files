@@ -8,6 +8,7 @@ Other:
 
 - Upgrade utilities in `download-utilities.yml` and `docs/examples`
 - Minor documentation fixes.
+- Enable specifying `default_yaml` environment variable so that it doesn't need to be provided as an argument.
 
 # download-utilities v2.15
 
