@@ -1,3 +1,10 @@
+# download-utilities v2.17
+
+Other:
+
+ - Update license
+ - Support MacOS `arch` returning `i386` on some 64-bit Macs.
+
 # download-utilities v2.16
 
 Bugfix:
