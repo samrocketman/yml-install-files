@@ -63,6 +63,10 @@ fi
 git tag "v$1"
 git push origin refs/tags/"v$1":refs/tags/"v$1"
 
+# Give GitHub the chance to surface the tag in the repo.
+echo 'Sleeping for 10 seconds...'
+sleep 10
+
 ./scratch/gh release create "v$1" --verify-tag \
   --title "download-utilities v$1" \
   --notes "$(notes | grep -vF "# download-utilities v$1" )"
