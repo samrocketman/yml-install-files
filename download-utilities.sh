@@ -1,11 +1,11 @@
 #!/bin/bash
-# download-utilities v2.16
-# Created by Sam Gleske
-# Fri 19 May 2023 06:01:53 PM EDT
-# MIT Licensed; https://github.com/samrocketman/yml-install-files
-# Ubuntu 20.04.6 LTS
-# Linux 5.15.0-71-generic x86_64
-# GNU bash, version 5.0.17(1)-release (x86_64-pc-linux-gnu)
+# download-utilities v2.17
+# Copyright (c) 2023-2024 Sam Gleske https://github.com/samrocketman/yml-install-files
+# MIT Licensed
+# Fri 19 May 2023 06:01:53 PM EDT initial release
+# Ubuntu 22.04.3 LTS
+# Linux 6.5.0-17-generic x86_64
+# GNU bash, version 5.1.16(1)-release (x86_64-pc-linux-gnu)
 
 set -euo pipefail
 
