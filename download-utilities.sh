@@ -195,7 +195,7 @@ redirect_utility() {
 setup_environment() {
   export arch checksum checksum_file default_download default_download_extract \
     default_eval_shell dest download extension extract only os owner perm \
-    post_command pre_command update utility version
+    post_command pre_command skip_if update utility version
   declare -a args
   args=( "$1" )
   if [ -z "${os:-}" ]; then
@@ -239,14 +239,8 @@ setup_environment() {
   perm="$(read_yaml "${args[@]}" perm none)"
   post_command="$(read_yaml "${args[@]}" post_command none)"
   pre_command="$(read_yaml "${args[@]}" pre_command none)"
+  skip_if="$(read_yaml "${args[@]}" skip_if none)"
   update="$(read_yaml "${args[@]}" update none)"
-
-  if [ -n "${only:-}" ]; then
-    if ! read_yaml "${args[@]}" only shell; then
-      echo "SKIP ${utility}: because matching only: $only" >&2
-      return 7
-    fi
-  fi
 
   if [ -z "${download:-}" ]; then
     echo "ERROR: ${utility}: no download URL specified." >&2
@@ -255,6 +249,19 @@ setup_environment() {
 
   if [ "${desired_command:-}" = download ] && [ -z "${version:-}" ]; then
     version="$(get_latest_util_version "${args[@]}")" || return 5
+  fi
+
+  if [ -n "${skip_if:-}" ]; then
+    if read_yaml "${args[@]}" skip_if shell; then
+      echo "SKIP ${utility}: because matching skip_if: $skip_if" >&2
+      return 7
+    fi
+  fi
+  if [ -n "${only:-}" ]; then
+    if ! read_yaml "${args[@]}" only shell; then
+      echo "SKIP ${utility}: because non-matching only: $only" >&2
+      return 7
+    fi
   fi
 }
 
