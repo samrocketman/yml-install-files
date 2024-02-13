@@ -1,8 +1,17 @@
 # download-utilities v2.17
 
+New feature:
+
+- :fire: Example and docs for downloading rust-lang so you don't need rustup.
+- New `skip_if` key for skipping the download of utilities.  This is similar to but opposite of `only`.
+
+Bugfix:
+
+- :boom: `only` was evaluated too early in some cases where `$version` was not available.
+
 Other:
 
- - Update license
+ - Update license year 2024
  - Support MacOS `arch` returning `i386` on some 64-bit Macs.
 
 # download-utilities v2.16
