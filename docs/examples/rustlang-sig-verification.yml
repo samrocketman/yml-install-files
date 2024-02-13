@@ -1,0 +1,57 @@
+#versions:
+#  rust.tar.gz: 1.76.0
+utility:
+  # https://prev.rust-lang.org/en-US/other-installers.html
+  rust.tar.gz:
+    skip_if: >-
+      [ -d "${dest}/rust-${version}-${arch}-${os}" ] &&
+      [ -L "${dest}/rust-${version}" ]  &&
+      [ -f "${dest}/rust-${version}-${arch}-${os}"/rust-path.sh ]
+    only: >-
+      [ ! -d "${dest}/rust-${version}-${arch}-${os}" ] ||
+      [ ! -L "${dest}/rust-${version}" ]  ||
+      [ ! -f "${dest}/rust-${version}-${arch}-${os}"/rust-path.sh ]
+    download: https://static.rust-lang.org/dist/rust-${version}-${arch}-${os}.tar.gz
+    pre_command: |
+      if [ "${checksum_failed:-true}" = true ]; then
+        rm -f ${dest}/${utility}
+      fi
+    post_command: |
+      if [ "${checksum_failed:-true}" = false ]; then
+        exit
+      fi
+      curl -sSfL https://static.rust-lang.org/rust-key.gpg.ascii | gpg --import
+      echo $"curl -sSfL \"${download}\".asc" | ${default_eval_shell} | gpg --verify - "${dest}/${utility}"
+      # by this point signature was verified so we can extract and symlink
+      tar -xzC "${dest}"/ --no-same-owner -f "${dest}/${utility}"
+      (
+        cd "${dest}"
+        ln -s "rust-${version}-${arch}-${os}" "rust-${version}"
+        cd "rust-${version}"
+        find "$PWD"/ -type d -name bin | sed 's/\/\//\//' | xargs -I{} echo -n {}: | xargs -I{} echo 'export PATH="{}:$PATH"' > rust-path.sh
+        set +x
+        echo
+        echo 'To use Rust, add the following to your bashrc:'
+        if echo "$PWD" | grep -F ' '; then
+          echo "    source '${PWD}'/rust-path.sh"
+        else
+          echo "    source ${PWD}/rust-path.sh"
+        fi
+        echo
+      )
+      # clean up download since it was extracted
+      rm -f "${dest}/${utility}"
+    #extract: tar -xzC ${dest}/ --no-same-owner
+    dest: ./scratch
+    os:
+      Linux: unknown-linux-gnu
+      Darwin: apple-darwin
+    arch:
+      Linux:
+      Darwin:
+        arm64: aarch64
+        i386: x86_64
+    update: |
+      export download=https://github.com/rust-lang/rust/releases/latest
+      eval "${default_download_head}" |
+      awk '$1 ~ /[Ll]ocation:/ { gsub(".*/[^0-9.]*", "", $0); print;exit}'
