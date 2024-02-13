@@ -22,6 +22,7 @@ The following fields support shell scripting as its value:
 - `post_command`
 - `pre_command`
 - `redirect` (specifically the child key values) if `type: redirect`
+- `skip_if`
 - `update`
 
 The following fields allow shell substitution scripting.  Bash is used for
@@ -225,7 +226,7 @@ In the above example, the `stdout` of `curl` is passed to `stdin` of `cat` or
 ### `only` shell script
 
 The YAML for `only` should just result in a conditional result based on exit
-code.  For example,
+code.  For example, (note: `false` is `/bin/false` which has exit code `1`)
 
 ```yaml
 only: false
@@ -248,6 +249,27 @@ This is an extremely early executing script.  The only field you can reliably
 check is the version number environment variable `${version}`.
 
 See [scala example][scala] which will redirect based on version number.
+
+### `skip_if` shell script
+
+`skip_if` is the same as `only` but opposite logic.
+
+The YAML for `skip_if` also a conditional result based on exit code.  For
+example, (note: `true` is `/bin/true` which has exit code `0`)
+
+```yaml
+skip_if: true
+```
+
+`/bin/true` will never execute scripts because it returns a zero exit code.  The
+following example will allow any architecture _except for_ arm64.
+
+```yaml
+skip_f: "[ ${arch} = arm64 ]"
+```
+
+> Note: the value of `${arch}` should be considered after variable translation.
+> This example assumes no translation.
 
 [bash]: https://www.gnu.org/software/bash/manual/html_node/Shell-Expansions.html
 [scala]: examples/scala.yml

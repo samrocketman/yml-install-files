@@ -19,6 +19,7 @@ utility:
     extension: echo tar.gz # optional shell script to echo the extension
     extract: # pipe the download into this shell script e.g. extraction
     only: # a conditional shell script which can skip downloading if false
+    skip_if: # a conditional shell script which can skip downloading if true
     os: # translation map from uname value to download file value
     owner: someuser # option username to chown
     perm: 0755 # optional permission to chmod

@@ -165,6 +165,25 @@ utility download.
 ./download-utilities.sh --download docs/examples/scala.yml scala=2.13.12
 ```
 
+# GPG signature verification
+
+To perform signature verification, you typically need to do the following:
+
+- You should name the `utility` the name of the archive and the `dest`
+  should be set where you expect the extraction to occur.
+- Remove the downloaded archive after extraction (optionally) with
+  `post_command`.
+- Skip re-downloading the archive (be idempotent) if certain post-extraction
+  conditions exist on the system.  Do this with `only` or `skip_if`.
+- Download the archive without extracting (do not declare `extract`)
+- Download and import the GPG key used for signing.
+- Verify the downloaded archive with a detached GPG signature.
+- Extract the archive, do any additional post-processing, and clean it up.
+
+See [Rust language download, verify, and extraciton
+example][rustlang-sig-verification].
+
+
 ### Complex example
 
 A large and complex example which uses advanced features like YAML achors and
@@ -179,3 +198,4 @@ aliases can be found in the repository root:
 [scala]: examples/scala.yml
 [yq-checksum]: examples/yq-checksum.yml
 [yq]: examples/yq.yml
+[rustlang-sig-verification]: examples/rustlang-sig-verification.yml
