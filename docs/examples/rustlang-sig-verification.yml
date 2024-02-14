@@ -1,16 +1,12 @@
 #versions:
-#  rust.tar.gz: 1.76.0
+#  rust-lang: 1.76.0
 utility:
   # https://prev.rust-lang.org/en-US/other-installers.html
-  rust.tar.gz:
+  rust-lang:
     skip_if: >-
       [ -d "${dest}/rust-${version}-${arch}-${os}" ] &&
       [ -L "${dest}/rust-${version}" ]  &&
       [ -f "${dest}/rust-${version}-${arch}-${os}"/rust-path.sh ]
-    only: >-
-      [ ! -d "${dest}/rust-${version}-${arch}-${os}" ] ||
-      [ ! -L "${dest}/rust-${version}" ]  ||
-      [ ! -f "${dest}/rust-${version}-${arch}-${os}"/rust-path.sh ]
     download: https://static.rust-lang.org/dist/rust-${version}-${arch}-${os}.tar.gz
     pre_command: |
       if [ "${checksum_failed:-true}" = true ]; then
@@ -41,7 +37,6 @@ utility:
       )
       # clean up download since it was extracted
       rm -f "${dest}/${utility}"
-    #extract: tar -xzC ${dest}/ --no-same-owner
     dest: ./scratch
     os:
       Linux: unknown-linux-gnu
