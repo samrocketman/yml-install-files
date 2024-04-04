@@ -94,9 +94,24 @@ translated.  For example, if `arch` returns a different value such as `arm64` or
 
 The following fields are **EXCLUDED** from this section of documentation.
 
-- `arch`
-- `os`
 - `version`
+
+`arch` and `os` are always considered without translation.  For example,
+
+```yaml
+utility:
+  utility_key:
+    os:
+      Linux:
+        default: linux
+        aarch64: linux-alpine
+      Darwin:
+        arm64: macOSarm
+        x86_64: macOS
+    arch:
+      Linux:
+        aarch64: arm64
+```
 
 All all other fields can have either a simple YAML String as the value or a
 hierarchy based on OS and architecture.
