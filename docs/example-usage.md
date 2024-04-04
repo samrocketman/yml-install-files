@@ -18,6 +18,9 @@ mkdir scratch
 
 # Update two specific utilities
 ./download-utilities.sh --update download-utilities.yml gh yq
+
+# Update two specific utilities but one with specific version
+./download-utilities.sh --update download-utilities.yml gh yq=4.43.1
 ```
 
 The YAML file argument is optional if the current working directory has a file
