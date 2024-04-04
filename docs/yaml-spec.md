@@ -161,6 +161,10 @@ More specific key takes precedence.  Here's the precedence order (where
 * `utility_key.${field}.${os}.${arch}`
 * `utility_key.${field}.${os}.default`
 * `utility_key.${field}.${os}`
+* `utility_key.${field}.${arch}.${os}`
+* `utility_key.${field}.${arch}.default`
+* `utility_key.${field}.${arch}`
 * `utility_key.${field}.default.${arch}`
+* `utility_key.${field}.default.${os}`
 * `utility_key.${field}.default`
 * `utility_key.${field}`
