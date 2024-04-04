@@ -265,7 +265,7 @@ skip_if: true
 following example will allow any architecture _except for_ arm64.
 
 ```yaml
-skip_f: "[ ${arch} = arm64 ]"
+skip_if: "[ ${arch} = arm64 ]"
 ```
 
 > Note: the value of `${arch}` should be considered after variable translation.
