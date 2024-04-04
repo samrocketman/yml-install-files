@@ -34,7 +34,8 @@ defaults: &defaults
   arch:
     x86_64: amd64
     aarch64: arm64
-    i386: amd64
+    Darwin:
+      i386: amd64
   pre_command: |
     if [ "${checksum_failed:-true}" = true ]; then
       rm -f ${dest}/${utility}
@@ -77,7 +78,8 @@ utility:
     # x86_64 and arm64
     arch:
       aarch64: arm64
-      i386: x86_64
+      Darwin:
+        i386: x86_64
     download: https://github.com/google/go-containerregistry/releases/download/v${version}/go-containerregistry_${os}_${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   cyclonedx:
@@ -88,7 +90,8 @@ utility:
     arch:
       x86_64: x64
       aarch64: arm64
-      i386: x64
+      Darwin:
+        i386: x64
     download: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v${version}/cyclonedx-${os}-${arch}
   docker-buildx:
     <<: *defaults
@@ -98,13 +101,15 @@ utility:
     # x86_64 and aarch64 are the two supported architectures.
     arch:
       arm64: aarch64
-      i386: x86_64
+      Darwin:
+        i386: x86_64
     download: https://github.com/docker/compose/releases/download/v${version}/docker-compose-${os}-${arch}
   dumb-init:
     <<: *defaults
     # force default architecture x86_64 and aarch64
     arch:
-      i386: x86_64
+      Darwin:
+        i386: x86_64
     only: "[ ${os} = linux ]"
     download: https://github.com/Yelp/dumb-init/releases/download/v${version}/dumb-init_${version}_${arch}
   gh:
@@ -145,7 +150,8 @@ utility:
     arch:
       x86_64: x64
       aarch64: arm64
-      i386: x64
+      Darwin:
+        i386: x64
     download: https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_${os}_${arch}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner ${utility}
   goss:
