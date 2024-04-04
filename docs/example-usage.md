@@ -15,6 +15,9 @@ mkdir scratch
 
 # in-place update versions of utilities within YAML
 ./download-utilities.sh --update download-utilities.yml
+
+# Update two specific utilities
+./download-utilities.sh --update download-utilities.yml gh yq
 ```
 
 The YAML file argument is optional if the current working directory has a file
