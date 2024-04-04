@@ -1,3 +1,10 @@
+# download-utilities v2.19
+
+New feature:
+
+- :rocket: You can now update specific utilities.
+- In addition to updating one or more specific utilitie, you can optionally set one of the updated utilities to a specific version.
+
 # download-utilities v2.18
 
 New feature:
