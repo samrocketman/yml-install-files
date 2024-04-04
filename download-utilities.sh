@@ -367,15 +367,21 @@ get_latest_util_version() (
 
 # $1=file $2=utility
 get_update() (
+  utility="$2"
   # ignore errors from environment setup; check for updates for all utilities
   setup_environment "$@" &> /dev/null || true
-  if [ -z "${update:-}" ]; then
-    echo "SKIP ${2}: no update script." >&2
-    yq_confined_edit ".versions.\"$2\" |= \"${version}\"" "$TMP_DIR/versions.yml"
-    return
+  if grep -F = <<< "$2" &> /dev/null; then
+    new_version="${2##*=}"
+    utility="${2%%=*}"
+  else
+    if [ -z "${update:-}" ]; then
+      echo "SKIP ${utility}: no update script." >&2
+      new_version="${version}"
+    else
+      new_version="$(get_latest_util_version "$@")" || return $?
+    fi
   fi
-  new_version="$(get_latest_util_version "$@")" || return $?
-  yq_confined_edit ".versions.\"$2\" |= \"${new_version}\"" \
+  yq_confined_edit ".versions.\"${utility}\" |= \"${new_version}\"" \
     "$TMP_DIR/versions.yml"
 )
 
