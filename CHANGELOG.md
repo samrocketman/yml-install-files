@@ -1,3 +1,13 @@
+# download-utilities v2.18
+
+New feature:
+
+- :rabbit: `os` and `arch` can now have varying values based on OS or arch.
+
+Other:
+
+- `download-utilities.yml` now calls out Darwin arch when translating i386.  i386 translation won't happen from Linux.
+
 # download-utilities v2.17
 
 New feature:
