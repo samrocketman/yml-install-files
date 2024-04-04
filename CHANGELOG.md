@@ -3,6 +3,7 @@
 New feature:
 
 - :rabbit: `os` and `arch` can now have varying values based on OS or arch.
+- Utilities can be downloaded organized by arch under OS or organized by OS under arch.
 
 Other:
 
