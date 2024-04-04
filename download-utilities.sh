@@ -376,22 +376,32 @@ get_update() (
   fi
   new_version="$(get_latest_util_version "$@")" || return $?
   yq_confined_edit ".versions.\"$2\" |= \"${new_version}\"" \
-    "$TMP_DIR/versions.yml" \
+    "$TMP_DIR/versions.yml"
 )
 
 filter_versions() (
-  awk '
+  awk -v invert="${1:-0}" '
     BEGIN {
       skipver=0;
+      invert=int(invert);
     };
     $0 ~ /^versions:/ {
       skipver=1;
+      if(invert) {
+        print;
+      }
       next;
     };
     skipver == 1 && $0 ~ /^  [^ ]/ {
+      if(invert) {
+        print;
+      }
       next;
     };
     {
+      if(invert) {
+        exit;
+      }
       skipver=0;
       print;
     }
@@ -546,16 +556,24 @@ checksum_command() {
 }
 
 update_command() {
-  touch "$TMP_DIR/versions.yml"
-
-  yq -r '.utility | keys | .[]' "$yaml_file" | (LC_ALL=C sort;) | \
+  local yaml_file="$1"
+  shift
+  (
+    if [ "$#" -gt 0 ]; then
+      filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
+      echo "$@" | xargs -n1
+    else
+      touch "$TMP_DIR/versions.yml"
+      yq -r '.utility | keys | .[]' "$yaml_file"
+    fi
+  ) | (LC_ALL=C sort;) | \
   while read -er util; do
-    get_update "$1" "$util"
+    get_update "$yaml_file" "$util"
   done
 
   # update versions without affecting the script bodies
-  filter_versions < "$1" > "$TMP_DIR/body.yml"
-  cat "$TMP_DIR/versions.yml" "$TMP_DIR/body.yml" > "$1"
+  filter_versions < "$yaml_file" > "$TMP_DIR/body.yml"
+  cat "$TMP_DIR/versions.yml" "$TMP_DIR/body.yml" > "$yaml_file"
 }
 
 process_args() {
