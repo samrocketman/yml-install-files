@@ -219,10 +219,12 @@ setup_environment() {
   # update utility based on possible redirect
   redirect_utility "$1" "$utility"
 
-  arch="$(yq -r ".utility.\"${utility}\".arch.${arch} // \"${arch}\"" "$1")"
-  os="$(yq -r ".utility.\"${utility}\".os.${os} // \"${os}\"" "$1")"
-
   args+=( "$utility" )
+
+  orig_arch="$arch"
+  orig_os="$os"
+  os="$(arch="$orig_arch" os="$orig_os" read_yaml "${args[@]}" os none)"
+  arch="$(arch="$orig_arch" os="$orig_os" read_yaml "${args[@]}" arch none)"
 
   # variables referenced by OS or architecture
   checksum_file="$(read_yaml "${args[@]}" checksum_file none)"
