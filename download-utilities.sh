@@ -347,18 +347,22 @@ download_utility() (
       read_yaml "${args[@]}" default_download_extract env_shell || return $?
     fi
   fi
-  if [ -n "${post_command:-}" ]; then
-    read_yaml "${args[@]}" post_command shell || return $?
+  if [ "${inline_checksum:-false}" = false ]; then
+    if [ -n "${post_command:-}" ]; then
+      read_yaml "${args[@]}" post_command shell || return $?
+    fi
   fi
   if [ -n "${checksum_file:-}" -o -n "${checksum:-}" ] &&
     [ -z "${skip_checksum:-}" ] && [ "${checksum_failed:-}" = true ]; then
     return 1
   fi
-  if [ -n "${perm:-}" ]; then
-    echo "chmod '${perm}' '${dest}/${utility}'" | eval_shell || return $?
-  fi
-  if [ -n "${owner:-}" ]; then
-      echo "chown '${owner}' '${dest}/${utility}'" | eval_shell || return $?
+  if [ "${inline_checksum:-false}" = false ]; then
+    if [ -n "${perm:-}" ]; then
+      echo "chmod '${perm}' '${dest}/${utility}'" | eval_shell || return $?
+    fi
+    if [ -n "${owner:-}" ]; then
+        echo "chown '${owner}' '${dest}/${utility}'" | eval_shell || return $?
+    fi
   fi
 )
 
@@ -662,6 +666,28 @@ checksum_command() {
       get_binary "$yaml_file" "$util" | checksum
     fi
   done
+  checksums_count="$(yq -r 'select(.checksums | type == "!!map").checksums | keys | length // 0' "$TMP_DIR/checksums.yml")"
+  if [ "$checksums_count" -gt 0 ]; then
+    # post-process checksums to flatten checksum maps
+    yq -r '.checksums | keys | .[]' "$TMP_DIR/checksums.yml" | while read -er util; do
+      util_key=".checksums.\"${util}\""
+      util_childkey_count="$(yq -r "select(${util_key} | type == "'"!!map"'")${util_key} | keys | length // 0" "$TMP_DIR/checksums.yml")"
+      if [ "$util_childkey_count" -eq 0 ]; then
+        continue
+      fi
+      yq -r "${util_key} | keys | .[]" "$TMP_DIR/checksums.yml" | while read -er childkey; do
+        childkey_count="$(yq -r "select(${util_key}.\"$childkey\" | type == "'"!!map"'")${util_key}.\"$childkey\" | keys | length // 0" "$TMP_DIR/checksums.yml")"
+        if [ ! "$childkey_count" -eq 1 ]; then
+          continue
+        fi
+        childkey_name="$(yq -r "${util_key}.\"$childkey\" | keys | .[]" "$TMP_DIR/checksums.yml")"
+        childkey_value="$(yq -r "${util_key}.\"$childkey\".\"${childkey_name}\"" "$TMP_DIR/checksums.yml")"
+        yq_confined_edit \
+          "${util_key}.\"$childkey\" |= \"${childkey_value}\"" \
+          "$TMP_DIR/checksums.yml"
+      done
+    done
+  fi
   if [ "${inline_checksum:-}" = true ]; then
     cat "$TMP_DIR/versions.yml" "$TMP_DIR/checksums.yml" "$TMP_DIR/body.yml" \
       > "$yaml_file"
