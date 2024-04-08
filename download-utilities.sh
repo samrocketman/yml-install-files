@@ -570,6 +570,30 @@ download_command() {
   done
 }
 
+# $1=file $2=utility
+get_field_os() (
+  if ! setup_environment "$@"; then
+    retcode=$?
+    if [ "$retcode" = 7 ]; then
+      return
+    fi
+    return "$retcode"
+  fi
+  echo "$os"
+)
+
+# $1=file $2=utility
+get_field_arch() (
+  if ! setup_environment "$@"; then
+    retcode=$?
+    if [ "$retcode" = 7 ]; then
+      return
+    fi
+    return "$retcode"
+  fi
+  echo "$arch"
+)
+
 checksum_command() {
   export skip_checksum=1
   local yaml_file="$1"
@@ -589,14 +613,13 @@ checksum_command() {
       yq -r '.utility | keys | .[]' "$yaml_file"
     fi
   ) | while read -er util; do
-    # this piped while loop is within a subshell
     if [ "$inline_checksum" = true ]; then
       unchanged=true
       prev_checksum=""
       for x in "${inline_os_arch[@]}"; do
-        os="${x%:*}" \
-        arch="${x#*:}" \
-          download_command "$yaml_file" "${util}"
+        export os="${x%:*}"
+        export arch="${x#*:}"
+        download_command "$yaml_file" "${util}"
         new_checksum="$(get_binary "$yaml_file" "$util" | checksum)"
         if [ -z "${prev_checksum:-}" ]; then
           prev_checksum="$new_checksum"
@@ -605,11 +628,13 @@ checksum_command() {
             unchanged=false
           fi
         fi
-        yq_confined_edit ".checksums.\"${utility}\".\"${os}\".\"${arch}\" |= \"${new_checksum}\"" \
+        os="$(get_field_os "$yaml_file" "$util")"
+        arch="$(get_field_arch "$yaml_file" "$util")"
+        yq_confined_edit ".checksums.\"${util}\".\"${os}\".\"${arch}\" |= \"${new_checksum}\"" \
           "$TMP_DIR/checksums.yml"
       done
       if [ "$unchanged" = true ]; then
-        yq_confined_edit ".checksums.\"${utility}\" |= \"${prev_checksum}\"" \
+        yq_confined_edit ".checksums.\"${util}\" |= \"${prev_checksum}\"" \
           "$TMP_DIR/checksums.yml"
       fi
     else
