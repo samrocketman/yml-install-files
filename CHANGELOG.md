@@ -1,3 +1,13 @@
+# download-utilities v2.20
+
+New feature:
+
+- Automatically generating inline checksums is now supported.
+
+Bugfix:
+
+- :boom: When specifying `checksum` field the checksum was not properly validated upon successful download.
+
 # download-utilities v2.19
 
 New feature:
