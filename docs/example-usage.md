@@ -110,7 +110,7 @@ checksum before updating the YAML file.
     -I Darwin:arm64
 ```
 
-The above command will organize checksums by architecture grouped underneat OS.
+The above command will organize checksums by architecture grouped underneate OS.
 If you want the grouping to be reversed (OS grouped under arch), then pass the
 `--invert-arch-os` option.
 
@@ -137,6 +137,17 @@ You can choose to checksum one or more utilities.
     dumb-init \
     gh
 ```
+
+> **Note:** if you already have checksums organized by `os` they will not be
+> automatically removed when you organize by `arch`.  This will introduce
+> problems when you try to validate checksums because `os` will always be
+> prioritized over `arch` since that's how the YAML parser prioritizes reading
+> keys.
+>
+> Remove all checksums before recalculating checkums.   Any time you are
+> inverting how checksums are organized (either by `arch` or `os`) this will
+> ensure only the intended checksum hashes are referenced when downloading and
+> validing downloads against checksum.
 
 ### Automatic updating
 
