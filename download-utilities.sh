@@ -601,8 +601,8 @@ checksum_command() {
   if [ "${inline_checksum:-}" = true ]; then
     filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
     filter_versions < "$yaml_file" > "$TMP_DIR/body.yml"
-    filter_versions 0 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/checksums.yml"
-    filter_versions 1 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/body.yml2"
+    filter_versions 1 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/checksums.yml"
+    filter_versions 0 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/body.yml2"
     mv "$TMP_DIR/body.yml2" "$TMP_DIR/body.yml"
     if [ ! -s "$TMP_DIR/checksums.yml" ]; then
       echo checksums: > "$TMP_DIR/checksums.yml"
