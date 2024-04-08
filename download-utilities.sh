@@ -411,7 +411,7 @@ filter_versions() (
       }
       next;
     };
-    skipver == 1 && $0 ~ /^  [^ ]/ {
+    skipver == 1 && $0 ~ /^   *[^ ]/ {
       if(invert) {
         print;
       }
@@ -600,9 +600,9 @@ checksum_command() {
   shift
   if [ "${inline_checksum:-}" = true ]; then
     filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
-    filter_versions 1 checksums < "$yaml_file" > "$TMP_DIR/checksums.yml"
     filter_versions < "$yaml_file" > "$TMP_DIR/body.yml"
-    filter_versions 0 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/body.yml2"
+    filter_versions 0 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/checksums.yml"
+    filter_versions 1 checksums < "$TMP_DIR/body.yml" > "$TMP_DIR/body.yml2"
     mv "$TMP_DIR/body.yml2" "$TMP_DIR/body.yml"
     if [ ! -s "$TMP_DIR/checksums.yml" ]; then
       echo checksums: > "$TMP_DIR/checksums.yml"
@@ -622,7 +622,9 @@ checksum_command() {
         export os="${x%:*}"
         export arch="${x#*:}"
         download_command "$yaml_file" "${util}"
-        new_checksum="$(cat "$(get_binary "$yaml_file" "$util")" | checksum)"
+        binary_path="$(get_binary "$yaml_file" "$util")"
+        new_checksum="$(cat "$binary_path" | checksum)"
+        rm -f "$binary_path"
         if [ -z "${prev_checksum:-}" ]; then
           prev_checksum="$new_checksum"
         else
@@ -630,9 +632,9 @@ checksum_command() {
             unchanged=false
           fi
         fi
-        os="$(get_field_os "$yaml_file" "$util")"
-        arch="$(get_field_arch "$yaml_file" "$util")"
-        yq_confined_edit ".checksums.\"${util}\".\"${os}\".\"${arch}\" |= \"${new_checksum}\"" \
+        local_os="$(get_field_os "$yaml_file" "$util")"
+        local_arch="$(get_field_arch "$yaml_file" "$util")"
+        yq_confined_edit ".checksums.\"${util}\".\"${local_os}\".\"${local_arch}\" |= \"${new_checksum}\"" \
           "$TMP_DIR/checksums.yml"
       done
       if [ "$unchanged" = true ]; then
