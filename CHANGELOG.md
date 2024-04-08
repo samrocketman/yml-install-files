@@ -2,7 +2,8 @@
 
 New feature:
 
-- Automatically generating inline checksums is now supported.
+- Automatically generating inline checksums is now supported.  Two new related
+  options: `--inline-os-arch` and `--invert-arch-os`.
 
 Bugfix:
 
