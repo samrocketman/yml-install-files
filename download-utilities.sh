@@ -518,7 +518,9 @@ Optional Commands:
       Downloads utilities from provided YAML.
 
   --checksum
-      Creates a sha256 checksum of all files assuming already downloaded.
+      Creates a sha256 checksum of all files.  By default it assumes files were
+      already downloaded.  It will auto-download if --inline-os-arch options
+      are specified.
 
   --update
       Updates the version of all utilities.
@@ -526,7 +528,11 @@ Optional Commands:
 Checksum options:
 
   --inline-os-arch OS:ARCH, -I OS:ARCH
-    Specify an OS and ARCH combination to perform inline checksumming.
+      Specify an OS and ARCH combination to perform inline checksumming.
+
+  --invert-arch-os
+      Checksum OSes are grouped under arch.  The default behavior is to group
+      architectures under OS.
 EOF
   exit 1
 }
@@ -638,8 +644,15 @@ checksum_command() {
         fi
         local_os="$(get_field_os "$yaml_file" "$util")"
         local_arch="$(get_field_arch "$yaml_file" "$util")"
-        yq_confined_edit ".checksums.\"${util}\".\"${local_os}\".\"${local_arch}\" |= \"${new_checksum}\"" \
-          "$TMP_DIR/checksums.yml"
+        if [ "$invert_arch_os" = true ]; then
+          yq_confined_edit \
+            ".checksums.\"${util}\".\"${local_arch}\".\"${local_os}\" |= \"${new_checksum}\"" \
+            "$TMP_DIR/checksums.yml"
+        else
+          yq_confined_edit \
+            ".checksums.\"${util}\".\"${local_os}\".\"${local_arch}\" |= \"${new_checksum}\"" \
+            "$TMP_DIR/checksums.yml"
+        fi
       done
       if [ "$unchanged" = true ]; then
         yq_confined_edit ".checksums.\"${util}\" |= \"${prev_checksum}\"" \
@@ -705,6 +718,10 @@ process_args() {
         shift
         shift
         ;;
+      --invert-arch-os)
+        invert_arch_os=true
+        shift
+        ;;
       *)
         if [ -z "${yaml_file:-}" ] && [ -e "$1" ]; then
           yaml_file="$1"
@@ -726,6 +743,7 @@ export yaml_file
 declare -a subcommand
 declare -a inline_os_arch
 export inline_checksum=false
+export invert_arch_os=false
 
 process_args "$@"
 if [ -z "${yaml_file:-}" ]; then
