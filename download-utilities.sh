@@ -622,7 +622,7 @@ checksum_command() {
         export os="${x%:*}"
         export arch="${x#*:}"
         download_command "$yaml_file" "${util}"
-        new_checksum="$(get_binary "$yaml_file" "$util" | checksum)"
+        new_checksum="$(cat "$(get_binary "$yaml_file" "$util")" | checksum)"
         if [ -z "${prev_checksum:-}" ]; then
           prev_checksum="$new_checksum"
         else
