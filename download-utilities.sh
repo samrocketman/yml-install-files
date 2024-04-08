@@ -563,8 +563,14 @@ checksum_command() {
   export skip_checksum=1
   local yaml_file="$1"
   shift
-  filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
-  filter_versions < "$yaml_file" > "$TMP_DIR/body.yml"
+  if [ "${inline_checksum:-}" = true ]; then
+    filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
+    filter_versions 1 checksums < "$yaml_file" > "$TMP_DIR/checksums.yml"
+    filter_versions < "$yaml_file" > "$TMP_DIR/body.yml"
+    if [ ! -s "$TMP_DIR/checksums.yml" ]; then
+      echo checksums: > "$TMP_DIR/checksums.yml"
+    fi
+  fi
   (
     if [ "$#" -gt 0 ]; then
       echo "$@" | xargs -n1
@@ -574,6 +580,10 @@ checksum_command() {
   ) | while read -er util; do
     get_binary "$yaml_file" "$util"
   done | checksum
+  if [ "${inline_checksum:-}" = true ]; then
+    cat "$TMP_DIR/versions.yml" "$TMP_DIR/checksums.yml" "$TMP_DIR/body.yml" \
+      > "$yaml_file"
+  fi
 }
 
 update_command() {
@@ -582,9 +592,12 @@ update_command() {
   (
     if [ "$#" -gt 0 ]; then
       filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
+      if [ ! -s "$TMP_DIR/versions.yml" ]; then
+        echo versions: > "$TMP_DIR/versions.yml"
+      fi
       echo "$@" | xargs -n1
     else
-      touch "$TMP_DIR/versions.yml"
+      echo versions: > "$TMP_DIR/versions.yml"
       yq -r '.utility | keys | .[]' "$yaml_file"
     fi
   ) | (LC_ALL=C sort;) | \
