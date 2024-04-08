@@ -350,8 +350,8 @@ download_utility() (
   if [ -n "${post_command:-}" ]; then
     read_yaml "${args[@]}" post_command shell || return $?
   fi
-  if [ -n "${checksum_file:-}" ] && [ -z "${skip_checksum:-}" ] &&
-    [ "${checksum_failed:-}" = true ]; then
+  if [ -n "${checksum_file:-}" -o -n "${checksum:-}" ] &&
+    [ -z "${skip_checksum:-}" ] && [ "${checksum_failed:-}" = true ]; then
     return 1
   fi
   if [ -n "${perm:-}" ]; then
