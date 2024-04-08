@@ -98,6 +98,46 @@ sha256sum -c checksums.sha256
 shasum -a 256 -c checksums.sha256
 ```
 
+Alternately, you can include checksums within the `download-utilities.yml` file
+via `--inline-os-arch` options (`-I` for short).  It will both download and
+checksum before updating the YAML file.
+
+```bash
+./download-utilities.sh --checksum \
+    -I Linux:x86_64 \
+    -I Linux:aarch64 \
+    -I Darwin:x86_64 \
+    -I Darwin:arm64
+```
+
+The above command will organize checksums by architecture grouped underneat OS.
+If you want the grouping to be reversed (OS grouped under arch), then pass the
+`--invert-arch-os` option.
+
+```bash
+./download-utilities.sh --checksum \
+    -I Linux:x86_64 \
+    -I Linux:aarch64 \
+    -I Darwin:x86_64 \
+    -I Darwin:arm64 \
+    --invert-arch-os
+```
+
+You can choose to checksum one or more utilities.
+
+```bash
+./download-utilities.sh --checksum \
+    -I Linux:x86_64 \
+    -I Linux:aarch64 \
+    -I Darwin:x86_64 \
+    -I Darwin:arm64 \
+    --invert-arch-os \
+    \
+    docker-compose \
+    dumb-init \
+    gh
+```
+
 ### Automatic updating
 
 [`checksums`](../checksums) directory provides an example of automatic updating.
