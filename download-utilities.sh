@@ -623,6 +623,10 @@ checksum_command() {
         export arch="${x#*:}"
         download_command "$yaml_file" "${util}"
         binary_path="$(get_binary "$yaml_file" "$util")"
+        if [ ! -f "$binary_path" ]; then
+          # skip_if or only filtered binary
+          continue
+        fi
         new_checksum="$(cat "$binary_path" | checksum)"
         rm -f "$binary_path"
         if [ -z "${prev_checksum:-}" ]; then
