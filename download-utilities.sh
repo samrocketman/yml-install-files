@@ -46,6 +46,13 @@ if [ -z "${default_checksum:-}" ]; then
     default_checksum='xargs sha256sum'
   fi
 fi
+if [ -z "${default_inline_checksum:-}" ]; then
+  if type -P shasum > /dev/null; then
+    default_inline_checksum='shasum -a 256 | grep -o '"'"'^[^[:space:]]\+'"'"
+  else
+    default_inline_checksum='sha256sum | grep -o '"'"'^[^[:space:]]\+'"'"
+  fi
+fi
 if [ -z "${default_verify_checksum:-}" ]; then
   if type -P shasum > /dev/null; then
     default_verify_checksum='shasum -a 256 -c -'
@@ -482,7 +489,11 @@ check_yaml() (
 )
 
 checksum() {
-  eval "${default_checksum}"
+  if [ "$inline_checksum" = true ]; then
+    eval "${default_inline_checksum}"
+  else
+    eval "${default_checksum}"
+  fi
 }
 
 help() {
@@ -578,8 +589,33 @@ checksum_command() {
       yq -r '.utility | keys | .[]' "$yaml_file"
     fi
   ) | while read -er util; do
-    get_binary "$yaml_file" "$util"
-  done | checksum
+    # this piped while loop is within a subshell
+    if [ "$inline_checksum" = true ]; then
+      unchanged=true
+      prev_checksum=""
+      for x in "${inline_os_arch[@]}"; do
+        os="${x%:*}" \
+        arch="${x#*:}" \
+          download_command "$yaml_file" "${util}"
+        new_checksum="$(get_binary "$yaml_file" "$util" | checksum)"
+        if [ -z "${prev_checksum:-}" ]; then
+          prev_checksum="$new_checksum"
+        else
+          if [ ! "$new_checksum" = "$prev_checksum" ]; then
+            unchanged=false
+          fi
+        fi
+        yq_confined_edit ".checksums.\"${utility}\".\"${os}\".\"${arch}\" |= \"${new_checksum}\"" \
+          "$TMP_DIR/checksums.yml"
+      done
+      if [ "$unchanged" = true ]; then
+        yq_confined_edit ".checksums.\"${utility}\" |= \"${prev_checksum}\"" \
+          "$TMP_DIR/checksums.yml"
+      fi
+    else
+      get_binary "$yaml_file" "$util" | checksum
+    fi
+  done
   if [ "${inline_checksum:-}" = true ]; then
     cat "$TMP_DIR/versions.yml" "$TMP_DIR/checksums.yml" "$TMP_DIR/body.yml" \
       > "$yaml_file"
