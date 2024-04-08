@@ -279,6 +279,11 @@ setup_environment() {
       return 7
     fi
   fi
+
+  if [ "$inline_checksum" = true ]; then
+    dest="$TMP_DIR/dest"
+    mkdir -p "$dest"
+  fi
 }
 
 # $1=file $2=utility
@@ -386,12 +391,13 @@ get_update() (
 )
 
 filter_versions() (
-  awk -v invert="${1:-0}" '
+  awk -v invert="${1:-0}" -v field="${2:-versions}" '
     BEGIN {
       skipver=0;
       invert=int(invert);
+      regex = "^"field":"
     };
-    $0 ~ /^versions:/ {
+    $0 ~ regex {
       skipver=1;
       if(invert) {
         print;
@@ -482,6 +488,8 @@ checksum() {
 help() {
 cat <<'EOF'
 download-utilities.sh [--download] [download-utilities.yml [utility]]
+download-utilities.sh --update [download-utilities.yml [utility]]
+download-utilities.sh --checksum [--inline-os-arch OS:ARCH ...] [download-utilities.yml [utility]]
 
 Example usage:
   Download utilities
@@ -503,6 +511,11 @@ Optional Commands:
 
   --update
       Updates the version of all utilities.
+
+Checksum options:
+
+  --inline-os-arch OS:ARCH, -I OS:ARCH
+    Specify an OS and ARCH combination to perform inline checksumming.
 EOF
   exit 1
 }
@@ -550,6 +563,8 @@ checksum_command() {
   export skip_checksum=1
   local yaml_file="$1"
   shift
+  filter_versions 1 < "$yaml_file" > "$TMP_DIR/versions.yml"
+  filter_versions < "$yaml_file" > "$TMP_DIR/body.yml"
   (
     if [ "$#" -gt 0 ]; then
       echo "$@" | xargs -n1
@@ -598,6 +613,16 @@ process_args() {
       --help|-h)
         help
         ;;
+      --inline-os-arch|-I)
+        if [ ! "$(echo "$2" | tr -cd : | wc -c)" -eq 1 ]; then
+          echo '--inline-os-arch must have OS:ARCH as following argument.' >&2
+          exit 1
+        fi
+        inline_os_arch+=( "$2" )
+        inline_checksum=true
+        shift
+        shift
+        ;;
       *)
         if [ -z "${yaml_file:-}" ] && [ -e "$1" ]; then
           yaml_file="$1"
@@ -617,10 +642,19 @@ process_args() {
 
 export yaml_file
 declare -a subcommand
+declare -a inline_os_arch
+export inline_checksum=false
 
 process_args "$@"
 if [ -z "${yaml_file:-}" ]; then
   yaml_file="${default_yaml:-}"
+fi
+
+if [ "$inline_checksum" = true ]; then
+  if [ ! "${desired_command}" = checksum ]; then
+    echo '--inline-os-arch is only available on --checksum' >&2
+    exit 1
+  fi
 fi
 
 cleanup_on() (
