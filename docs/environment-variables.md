@@ -39,13 +39,15 @@ Different variable defaults depending on the existence of `shasum`.
 
 ```bash
 # if shasum is detected these are the defaults
-default_checksum='xargs shasum -a 256'
+default_checksum='shasum -a 256 | grep -o '"'"'^[^[:space:]]\+'"'"
 default_verify_checksum='shasum -a 256 -c -'
 
 # alternate, fall back to sha256sum if no shasum
-default_checksum='xargs sha256sum'
+default_checksum='sha256sum | grep -o '"'"'^[^[:space:]]\+'"'"
 default_verify_checksum='sha256sum -c -'
 ```
+
+`default_checksum` is used to create checksums via `--checksum` option.
 
 ### Variable Definition
 

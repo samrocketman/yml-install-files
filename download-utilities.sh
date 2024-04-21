@@ -41,16 +41,9 @@ if [ -z "${default_download_head:-}" ]; then
 fi
 if [ -z "${default_checksum:-}" ]; then
   if type -P shasum > /dev/null; then
-    default_checksum='xargs shasum -a 256'
+    default_checksum='shasum -a 256 | grep -o '"'"'^[^[:space:]]\+'"'"
   else
-    default_checksum='xargs sha256sum'
-  fi
-fi
-if [ -z "${default_inline_checksum:-}" ]; then
-  if type -P shasum > /dev/null; then
-    default_inline_checksum='shasum -a 256 | grep -o '"'"'^[^[:space:]]\+'"'"
-  else
-    default_inline_checksum='sha256sum | grep -o '"'"'^[^[:space:]]\+'"'"
+    default_checksum='sha256sum | grep -o '"'"'^[^[:space:]]\+'"'"
   fi
 fi
 if [ -z "${default_verify_checksum:-}" ]; then
@@ -60,7 +53,7 @@ if [ -z "${default_verify_checksum:-}" ]; then
     default_verify_checksum='sha256sum -c -'
   fi
 fi
-export default_checksum default_download default_download_extract \
+export default_download default_download_extract \
   default_download_head default_eval_shell default_verify_checksum \
   default_yaml yq_mirror yq_version
 
@@ -475,11 +468,7 @@ check_yaml() (
 )
 
 checksum() {
-  if [ "$inline_checksum" = true ]; then
-    eval "${default_inline_checksum}"
-  else
-    eval "${default_checksum}"
-  fi
+  eval "${default_checksum}"
 }
 
 help() {

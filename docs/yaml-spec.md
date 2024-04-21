@@ -9,7 +9,6 @@ utility:
   # name of utility downloaded to the dest
   utility_key:
     arch: # translation map from arch value to download file value
-    checksum_file: # a file created by './download-utilities.sh --checksum'
     checksum: # a checksum of the downloaded utility that must pass
     default_download: # change script for downloading; see shell script docs
     default_download_extract: # change script for downloading; see shell script docs
