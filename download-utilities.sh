@@ -214,9 +214,9 @@ redirect_utility() {
 
 # $1=file $2=utility
 setup_environment() {
-  export arch checksum checksum_file default_download default_download_extract \
-    default_eval_shell dest download extension extract only os owner perm \
-    post_command pre_command skip_if update utility version
+  export arch checksum default_download default_download_extract \
+  default_eval_shell dest download extension extract only os owner perm \
+  post_command pre_command skip_if update utility version
   declare -a args
   args=( "$1" )
   if [ -z "${os:-}" ]; then
@@ -248,7 +248,6 @@ setup_environment() {
   arch="$(arch="$orig_arch" os="$orig_os" read_yaml "${args[@]}" arch none)"
 
   # variables referenced by OS or architecture
-  checksum_file="$(read_yaml "${args[@]}" checksum_file none)"
   checksum="$(read_yaml "${args[@]}" checksum none)"
   default_download="$(read_yaml "${args[@]}" default_download none)"
   default_download_extract="$(read_yaml "${args[@]}" default_download_extract none)"
@@ -310,25 +309,6 @@ download_utility() (
       # checksum success
       checksum_failed=false
     fi
-  elif [ -n "${checksum_file:-}" ]; then
-    checksum_file="$(read_yaml "${args[@]}" checksum_file env)"
-    checksum_failed=true
-    if ! grep '^/' > /dev/null <<< "${checksum_file}"; then
-      if grep -F / > /dev/null <<< "$1"; then
-        checksum_file="${1%/*}/${checksum_file}"
-      fi
-    fi
-    if [ ! -f "${checksum_file}" ]; then
-      echo "ERROR: Checksum file '${checksum_file}' does not exist." >&2
-      return 5
-    fi
-    if grep -F "${dest}/${utility}" "${checksum_file}" | {
-        eval "${default_verify_checksum}"
-      }; then
-      # checksum success
-      checksum_failed=false
-    fi
-    # checksum failed
   fi
   if [ "${inline_checksum:-false}" = false ]; then
     if [ -n "${pre_command:-}" ]; then
@@ -354,7 +334,7 @@ download_utility() (
       read_yaml "${args[@]}" post_command shell || return $?
     fi
   fi
-  if [ -n "${checksum_file:-}" -o -n "${checksum:-}" ] &&
+  if [ -n "${checksum:-}" ] &&
     [ -z "${skip_checksum:-}" ] && [ "${checksum_failed:-}" = true ]; then
     return 1
   fi
