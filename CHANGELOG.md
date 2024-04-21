@@ -1,7 +1,16 @@
 # download-utilities v3.1
 
-- :boom: This is a breaking change.  Support for external `checksum_file` is dropped.
+Mostly breaking changes.  Due to the unfriendliness of `--checksum` option and
+inline checksums being both more robust and more user friendly; support for
+checksum files has been dropped.  Inline checksums within the YAML are now the
+only available support.
+
+- :boom: This is a breaking change.  Support for external `checksum_file` is
+  dropped.
 - Skip `pre_command` when creating inline checksums.
+- Removed `default_inline_checksum` environment variable.
+- `default_checksum` environment variable has been repurposed to be equivalent
+  to the former `default_inline_checksum` variable.
 
 # download-utilities v2.20
 
