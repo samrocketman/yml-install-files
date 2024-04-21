@@ -763,6 +763,10 @@ if [ "$inline_checksum" = true ]; then
     echo '--inline-os-arch is only available on --checksum' >&2
     exit 1
   fi
+elif [ "${desired_command}" = checksum ]; then
+  echo 'Calculating --checksum requested but missing required --inline-os-arch option.' >&2
+  echo 'Otherwise, checksums for platforms cannot be calculated.' >&2
+  exit 1
 fi
 
 cleanup_on() (
