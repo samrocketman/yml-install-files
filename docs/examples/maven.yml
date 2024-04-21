@@ -1,5 +1,7 @@
 versions:
   maven.tar.gz: 3.9.6
+checksums:
+  maven.tar.gz: 6eedd2cae3626d6ad3a5c9ee324bd265853d64297f07f033430755bd0e0c3a4b
 utility:
   maven.tar.gz:
     dest: /tmp
@@ -7,7 +9,6 @@ utility:
     only: '[ ! -e scratch/apache-maven ] || [ -n "${skip_checksum:-}" ]'
     #download: https://dlcdn.apache.org/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.tar.gz
     download: https://repo1.maven.org/maven2/org/apache/maven/apache-maven/${version}/apache-maven-${version}-bin.tar.gz
-    checksum_file: maven.sha256
     post_command: |
       # checksuming so skip post-download action
       if [ -n "${skip_checksum:-}" ]; then
