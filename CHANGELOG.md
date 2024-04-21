@@ -1,3 +1,8 @@
+# download-utilities v3.1
+
+- :boom: This is a breaking change.  Support for external `checksum_file` is dropped.
+- Skip `pre_command` when creating inline checksums.
+
 # download-utilities v2.20
 
 New feature:
