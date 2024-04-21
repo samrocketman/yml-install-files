@@ -330,8 +330,10 @@ download_utility() (
     fi
     # checksum failed
   fi
-  if [ -n "${pre_command:-}" ]; then
-    read_yaml "${args[@]}" pre_command shell || return $?
+  if [ "${inline_checksum:-false}" = false ]; then
+    if [ -n "${pre_command:-}" ]; then
+      read_yaml "${args[@]}" pre_command shell || return $?
+    fi
   fi
   if [ ! -d "${dest}" ]; then
     echo "ERROR: '${dest}' must exist as a directory and does not." >&2
