@@ -38,10 +38,10 @@ From repository root run the following command.
 
 ### Post actions and upgrading utilities
 
-You can specify a `checksum_file` to validate the download, and run custom
-commands before or after the download via `pre_command` and `post_command`.  If
-you wanted to skip downloading if given certain conditions then you would
-specify a shell conditional in `only`.
+You can specify a `checksum` to validate the download, and run custom commands
+before or after the download via `pre_command` and `post_command`.  If you
+wanted to skip downloading if given certain conditions then you would specify a
+shell conditional in `only`.
 
 YAML example: [Maven][maven]
 
@@ -55,20 +55,12 @@ maven example has an `update` defined which will output the latest release
 version number to stdout.
 
 ```bash
-# set up environment to force download
-export skip_checksum=1
-
 # update version numbers with latest release
 ./download-utilities.sh --update docs/examples/maven.yml
 
-# download the latest relese
-./download-utilities.sh docs/examples/maven.yml
-
 # update the checksum
 ./download-utilities.sh --checksum docs/examples/maven.yml \
-  > docs/examples/maven.sha256
-
-unset skip_checksum
+  --inline-os-arch Linux:x86_64
 ```
 
 ### Top level fields vs utility fields
@@ -111,7 +103,17 @@ utility:
     ...
 ```
 
-For an example, see [`yq-checksum.yml`][yq-checksum].
+For an example, see [`yq-checksum.yml`][yq-checksum].  You can update
+multi-platform checksums with the following commands.
+
+```
+./download-utilities.sh --update docs/examples/yq-checksum.yml
+./download-utilities.sh --checksum docs/examples/yq-checksum.yml \
+  -I Darwin:arm64 \
+  -I Darwin:x86_64 \
+  -I Linux:aarch64 \
+  -I Linux:x86_64
+```
 
 The purpose of making this flexibility for any field is to better support the
 automation around generating custom `download-utilities.yml`.  For example, you
