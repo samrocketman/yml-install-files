@@ -64,9 +64,7 @@ Misc options
 - `default_yaml` - If the user does not provide a YAML file, then this default
   YAML file will be searched in the current working directory.
 - `skip_checksum` - Download without performing a checksum, even if
-  `checksum_file` is available.  The purpose is to help with automatic update of
-  checksum files.  You can see examples of this in [`checksums/`](checksums) and
-  [YAML examples](yaml-examples.md).
+  `checksum` is available.
 
 Self-bootstrap `yq` options: when `yq` is not available in the environment, and
 other dependencies are satisfied, this script can self-bootstrap `yq`.  These
