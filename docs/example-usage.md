@@ -99,7 +99,7 @@ shasum -a 256 -c checksums.sha256
 ```
 
 Alternately, you can include checksums within the `download-utilities.yml` file
-via `--inline-os-arch` options (`-I` for short).  It will both download and
+via `--os-arch` options (`-I` for short).  It will both download and
 checksum before updating the YAML file.
 
 ```bash

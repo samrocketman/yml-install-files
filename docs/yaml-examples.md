@@ -60,7 +60,7 @@ version number to stdout.
 
 # update the checksum
 ./download-utilities.sh --checksum docs/examples/maven.yml \
-  --inline-os-arch Linux:x86_64
+  --os-arch Linux:x86_64
 ```
 
 ### Top level fields vs utility fields
