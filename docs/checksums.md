@@ -57,11 +57,11 @@ download-utilities.sh --checksum \
   -I Linux:x86_64
 ```
 
-When utilities are downloaded the checksum referred is `"$(uname):$(arch)".  You
-don't need to specify every architecture documented here; just the ones you care
-to support.  You may even want to support more than what is listed.  As long as
-you pass in the proper OS and CPU architecture that would be detected by `uname`
-and `arch`.
+When utilities are downloaded the checksum referred is `"$(uname):$(arch)"`.
+You don't need to specify every architecture documented here; just the ones you
+care to support.  You may even want to support more than what is listed.  As
+long as you pass in the proper OS and CPU architecture that would be detected by
+`uname` and `arch`.
 
 ### Fields skipped by checksum
 
