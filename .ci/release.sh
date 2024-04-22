@@ -35,8 +35,6 @@ tar -c \
   CHANGELOG.md \
   README.md \
   docs \
-  checksums/Dockerfile \
-  checksums/README.md \
   checksums/update.sh \
   | gzip -9 > universal.tgz
 
