@@ -230,6 +230,7 @@ setup_environment() {
     version="$(read_yaml "${args[@]}" "$2" version none)"
     utility="$2"
   fi
+
   # update utility based on possible redirect
   redirect_utility "$1" "$utility"
 
@@ -372,8 +373,10 @@ get_update() (
       new_version="$(get_latest_util_version "$@")" || return $?
     fi
   fi
-  yq_confined_edit ".versions.\"${utility}\" |= \"${new_version}\"" \
-    "$TMP_DIR/versions.yml"
+  if [ -n "${new_version:-}" ]; then
+    yq_confined_edit ".versions.\"${utility}\" |= \"${new_version}\"" \
+      "$TMP_DIR/versions.yml"
+  fi
 )
 
 filter_versions() (

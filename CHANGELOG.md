@@ -12,6 +12,10 @@ only available support.
 - `default_checksum` environment variable has been repurposed to be equivalent
   to the former `default_inline_checksum` variable.
 
+Other minor changes:
+
+- Do not write out version on `--update` if version is empty.
+
 # download-utilities v2.20
 
 New feature:
