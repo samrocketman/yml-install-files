@@ -88,7 +88,7 @@ Checksums are optional.
 
 ### Automatic updating
 
-[`checksums/update.sh`](checksums/update.sh) is an example of automatic
+[`checksums/update.sh`](../checksums/update.sh) is an example of automatic
 updating.
 
 1. Checks for new versions of utilities.
