@@ -1,4 +1,4 @@
-# download-utilities v3.1
+# download-utilities v3.0
 
 Mostly breaking changes.  Due to the unfriendliness of `--checksum` option and
 inline checksums being both more robust and more user friendly; support for
