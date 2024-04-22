@@ -44,10 +44,10 @@ utility:
 
 ### Generate checksums
 
-To generate download checksums for each platform you want to support you need to
-provide OS names and CPU architectures you want calculated.  It will download
+To generate download checksums for each platform you want to support, you need
+to provide OS names and CPU architectures you want calculated.  It will download
 and extract the utility for each OS in order to calculate.  The following is an
-example.
+example via `--os-arch` options (`-I` for short).
 
 ```bash
 download-utilities.sh --checksum \
@@ -62,6 +62,47 @@ You don't need to specify every architecture documented here; just the ones you
 care to support.  You may even want to support more than what is listed.  As
 long as you pass in the proper OS and CPU architecture that would be detected by
 `uname` and `arch`.
+
+### Organize checksums by arch
+
+The above command will organize checksums by architecture grouped underneath OS.
+If you want the grouping to be reversed (OS grouped under arch), then pass the
+`--invert-arch-os` option.
+
+```bash
+./download-utilities.sh --checksum \
+    -I Linux:x86_64 \
+    -I Linux:aarch64 \
+    -I Darwin:x86_64 \
+    -I Darwin:arm64 \
+    --invert-arch-os
+```
+
+You can choose to checksum one or more utilities.
+
+```bash
+./download-utilities.sh --checksum \
+    -I Linux:x86_64 \
+    -I Linux:aarch64 \
+    -I Darwin:x86_64 \
+    -I Darwin:arm64 \
+    --invert-arch-os \
+    \
+    docker-compose \
+    dumb-init \
+    gh
+```
+
+> **Note:** if you already have checksums organized by `os` they will not be
+> automatically removed when you organize by `arch`.  This will introduce
+> problems when you try to validate checksums because `os` will always be
+> prioritized over `arch` since that's how the YAML parser prioritizes reading
+> keys.
+>
+> Remove all checksums before recalculating checkums.   Any time you are
+> inverting how checksums are organized (either by `arch` or `os`) this will
+> ensure only the intended checksum hashes are referenced when downloading and
+> validing downloads against checksum.
 
 ### Fields skipped by checksum
 

@@ -10,9 +10,6 @@ mkdir scratch
 # download utilities
 ./download-utilities.sh download-utilities.yml
 
-# generate a checksum file
-./download-utilities.sh --checksum download-utilities.yml > checksums.sha256sum
-
 # in-place update versions of utilities within YAML
 ./download-utilities.sh --update download-utilities.yml
 
@@ -80,75 +77,19 @@ download it.
 ./download-utilities.sh download-utilities.yml yq=latest dumb-init=latest
 ```
 
-### Checksum utilities
+# Checksums
 
-Checksum files are meant for validating downloads from the internet.  A checksum
-is useful for validating Docker images if no utility versions of changed and you
-want to ensure integrity of all downloaded utilities.
+Checksums are used to validate downloads don't have unexpected changes or
+corruption.
 
-Create checksums of installed utilities.
+See [checksums.md](checksums.md) for examples.
 
-```bash
-./download-utilities.sh --checksum > checksums.sha256
-
-# which you can then validate
-sha256sum -c checksums.sha256
-
-# or on BSD/Mac
-shasum -a 256 -c checksums.sha256
-```
-
-Alternately, you can include checksums within the `download-utilities.yml` file
-via `--os-arch` options (`-I` for short).  It will both download and
-checksum before updating the YAML file.
-
-```bash
-./download-utilities.sh --checksum \
-    -I Linux:x86_64 \
-    -I Linux:aarch64 \
-    -I Darwin:x86_64 \
-    -I Darwin:arm64
-```
-
-The above command will organize checksums by architecture grouped underneate OS.
-If you want the grouping to be reversed (OS grouped under arch), then pass the
-`--invert-arch-os` option.
-
-```bash
-./download-utilities.sh --checksum \
-    -I Linux:x86_64 \
-    -I Linux:aarch64 \
-    -I Darwin:x86_64 \
-    -I Darwin:arm64 \
-    --invert-arch-os
-```
-
-You can choose to checksum one or more utilities.
-
-```bash
-./download-utilities.sh --checksum \
-    -I Linux:x86_64 \
-    -I Linux:aarch64 \
-    -I Darwin:x86_64 \
-    -I Darwin:arm64 \
-    --invert-arch-os \
-    \
-    docker-compose \
-    dumb-init \
-    gh
-```
-
-> **Note:** if you already have checksums organized by `os` they will not be
-> automatically removed when you organize by `arch`.  This will introduce
-> problems when you try to validate checksums because `os` will always be
-> prioritized over `arch` since that's how the YAML parser prioritizes reading
-> keys.
->
-> Remove all checksums before recalculating checkums.   Any time you are
-> inverting how checksums are organized (either by `arch` or `os`) this will
-> ensure only the intended checksum hashes are referenced when downloading and
-> validing downloads against checksum.
+Checksums are optional.
 
 ### Automatic updating
 
-[`checksums`](../checksums) directory provides an example of automatic updating.
+[`checksums/update.sh`](checksums/update.sh) is an example of automatic
+updating.
+
+1. Checks for new versions of utilities.
+2. If updates, then recalculate checksums.
