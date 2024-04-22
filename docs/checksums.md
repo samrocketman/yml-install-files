@@ -62,3 +62,12 @@ don't need to specify every architecture documented here; just the ones you care
 to support.  You may even want to support more than what is listed.  As long as
 you pass in the proper OS and CPU architecture that would be detected by `uname`
 and `arch`.
+
+### Fields skipped by checksum
+
+When you request a checksum to be calculated; only the download and, optionally,
+extraction need to occur.  The following fields are not run when using
+`--checksum` option.
+
+- `pre_command`
+- `post_command`
