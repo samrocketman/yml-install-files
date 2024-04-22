@@ -67,7 +67,7 @@ long as you pass in the proper OS and CPU architecture that would be detected by
 
 The above command will organize checksums by architecture grouped underneath OS.
 If you want the grouping to be reversed (OS grouped under arch), then pass the
-`--invert-arch-os` option.
+`--invert-os-arch` option.
 
 ```bash
 ./download-utilities.sh --checksum \
@@ -75,7 +75,7 @@ If you want the grouping to be reversed (OS grouped under arch), then pass the
     -I Linux:aarch64 \
     -I Darwin:x86_64 \
     -I Darwin:arm64 \
-    --invert-arch-os
+    --invert-os-arch
 ```
 
 You can choose to checksum one or more utilities.
@@ -86,7 +86,7 @@ You can choose to checksum one or more utilities.
     -I Linux:aarch64 \
     -I Darwin:x86_64 \
     -I Darwin:arm64 \
-    --invert-arch-os \
+    --invert-os-arch \
     \
     docker-compose \
     dumb-init \
@@ -110,5 +110,7 @@ When you request a checksum to be calculated; only the download and, optionally,
 extraction need to occur.  The following fields are not run when using
 `--checksum` option.
 
-- `pre_command`
+- `chmod`
+- `chown`
 - `post_command`
+- `pre_command`
