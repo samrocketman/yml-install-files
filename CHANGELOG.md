@@ -7,13 +7,15 @@ only available support.
 
 - :boom: This is a breaking change.  Support for external `checksum_file` is
   dropped.
-- Skip `pre_command` when creating inline checksums.
 - Removed `default_inline_checksum` environment variable.
 - `default_checksum` environment variable has been repurposed to be equivalent
   to the former `default_inline_checksum` variable.
+- `--inline-os-arch` option renamed to `--os-arch`
+- `--invert-arch-os` option renamed to `--invert-os-arch`
 
 Other minor changes:
 
+- Skip `pre_command` when creating inline checksums.
 - Do not write out version on `--update` if version is empty.
 
 # download-utilities v2.20

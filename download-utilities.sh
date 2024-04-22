@@ -478,7 +478,7 @@ help() {
 cat <<'EOF'
 download-utilities.sh [--download] [download-utilities.yml [utility]]
 download-utilities.sh --update [download-utilities.yml [utility]]
-download-utilities.sh --checksum [--inline-os-arch OS:ARCH ...] [download-utilities.yml [utility]]
+download-utilities.sh --checksum [--os-arch OS:ARCH ...] [download-utilities.yml [utility]]
 
 Example usage:
   Download utilities
@@ -497,7 +497,7 @@ Optional Commands:
 
   --checksum
       Creates a sha256 checksum of all files.  By default it assumes files were
-      already downloaded.  It will auto-download if --inline-os-arch options
+      already downloaded.  It will auto-download if --os-arch options
       are specified.
 
   --update
@@ -505,10 +505,10 @@ Optional Commands:
 
 Checksum options:
 
-  --inline-os-arch OS:ARCH, -I OS:ARCH
+  --os-arch OS:ARCH, -I OS:ARCH
       Specify an OS and ARCH combination to perform inline checksumming.
 
-  --invert-arch-os
+  --invert-os-arch
       Checksum OSes are grouped under arch.  The default behavior is to group
       architectures under OS.
 EOF
@@ -622,7 +622,7 @@ checksum_command() {
         fi
         local_os="$(get_field_os "$yaml_file" "$util")"
         local_arch="$(get_field_arch "$yaml_file" "$util")"
-        if [ "$invert_arch_os" = true ]; then
+        if [ "$invert_os_arch" = true ]; then
           yq_confined_edit \
             ".checksums.\"${util}\".\"${local_arch}\".\"${local_os}\" |= \"${new_checksum}\"" \
             "$TMP_DIR/checksums.yml"
@@ -708,9 +708,9 @@ process_args() {
       --help|-h)
         help
         ;;
-      --inline-os-arch|-I)
+      --os-arch|-I)
         if [ ! "$(echo "$2" | tr -cd : | wc -c)" -eq 1 ]; then
-          echo '--inline-os-arch must have OS:ARCH as following argument.' >&2
+          echo '--os-arch must have OS:ARCH as following argument.' >&2
           exit 1
         fi
         inline_os_arch+=( "$2" )
@@ -718,8 +718,8 @@ process_args() {
         shift
         shift
         ;;
-      --invert-arch-os)
-        invert_arch_os=true
+      --invert-os-arch)
+        invert_os_arch=true
         shift
         ;;
       *)
@@ -743,7 +743,7 @@ export yaml_file
 declare -a subcommand
 declare -a inline_os_arch
 export inline_checksum=false
-export invert_arch_os=false
+export invert_os_arch=false
 
 process_args "$@"
 if [ -z "${yaml_file:-}" ]; then
@@ -752,11 +752,11 @@ fi
 
 if [ "$inline_checksum" = true ]; then
   if [ ! "${desired_command}" = checksum ]; then
-    echo '--inline-os-arch is only available on --checksum' >&2
+    echo '--os-arch is only available on --checksum' >&2
     exit 1
   fi
 elif [ "${desired_command}" = checksum ]; then
-  echo 'Calculating --checksum requested but missing required --inline-os-arch option.' >&2
+  echo 'Calculating --checksum requested but missing required --os-arch option.' >&2
   echo 'Otherwise, checksums for platforms cannot be calculated.' >&2
   exit 1
 fi
