@@ -8,7 +8,7 @@ utility:
   scala3:
     dest: ./scratch
     only: '[ ! -f "${dest}"/scala-env.sh ] || [ ! -d "${dest}/scala3-${version}" ]'
-    download: https://github.com/lampepfl/dotty/releases/download/${version}/scala3-${version}.tar.gz
+    download: https://github.com/scala/scala3/releases/download/${version}/scala3-${version}.tar.gz
     extract: tar -xzC ${dest}/ --no-same-owner
     post_command: |
       cat > "${dest}/scala-env.sh" << EOF
