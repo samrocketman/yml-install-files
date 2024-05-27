@@ -1,5 +1,10 @@
 # download-utilities v3.0
 
+- 💥 Bugfix reading from stdin from CLI arguments.  Setting `yaml_file=-`
+  environment variable still works in earlier versions
+
+# download-utilities v3.0
+
 Mostly breaking changes.  Due to the unfriendliness of `--checksum` option and
 inline checksums being both more robust and more user friendly; support for
 checksum files has been dropped.  Inline checksums within the YAML are now the
