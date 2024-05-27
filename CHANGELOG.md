@@ -1,7 +1,7 @@
-# download-utilities v3.0
+# download-utilities v3.1
 
 - 💥 Bugfix reading from stdin from CLI arguments.  Setting `yaml_file=-`
-  environment variable still works in earlier versions
+  environment variable still works in earlier versions.
 
 # download-utilities v3.0
 
