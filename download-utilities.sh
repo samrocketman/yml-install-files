@@ -723,10 +723,10 @@ process_args() {
         shift
         ;;
       *)
-        if [ -z "${yaml_file:-}" ] && [ -e "$1" ]; then
+        if [ -z "${yaml_file:-}" ] && ( [ -e "$1" ] || [ "x$1" = "x-" ]; ); then
           yaml_file="$1"
           shift
-        else
+        else 
           if [ -z "${skip_checksum:-}" ] && grep -F = <<< "$1" &> /dev/null; then
             echo 'Set skip_checksum=1 because requesting custom version.' >&2
             export skip_checksum=1
