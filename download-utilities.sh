@@ -1,5 +1,5 @@
 #!/bin/bash
-# download-utilities v3.0
+# download-utilities v3.1
 # Copyright (c) 2023-2024 Sam Gleske https://github.com/samrocketman/yml-install-files
 # MIT Licensed
 # Fri 19 May 2023 06:01:53 PM EDT initial release
