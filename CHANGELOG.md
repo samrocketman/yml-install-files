@@ -3,6 +3,7 @@
 - 💥 Bugfix reading from stdin from CLI arguments.  Setting `yaml_file=-`
   environment variable still works in earlier versions.
 - Utilities and examples updated
+- Remove `gimme` utility from examples.
 
 # download-utilities v3.0
 

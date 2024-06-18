@@ -6,7 +6,6 @@ versions:
   docker-compose: 2.27.1
   dumb-init: 1.2.5
   gh: 2.51.0
-  gimme: 1.5.5
   git-idm: a598aece805228fcc404af7597fd5cd9d98f6d44
   gitleaks: 8.18.4
   goss: 0.4.7
@@ -66,7 +65,6 @@ checksums:
     linux:
       arm64: 8c0a0b369ca257bd0affda1223384a1c603cf7e3e5266ccb442de1d4410d244b
       amd64: c7e26ddb38be5773113e8b3a7fa439efe25f946e93035b193e362095cbcfd1d4
-  gimme: 3d565d57ec28edb14be9e540cd3e628607ec5b791e78224c47250d36ce4aedf2
   git-idm: d99592623838932190083cd1f2c8bc47af9f97e8fa4b6dab580c80830d4e2071
   gitleaks:
     darwin:
@@ -261,10 +259,6 @@ utility:
         }
       linux: tar -xzC ${dest}/ --no-same-owner --strip-components=2 gh_${version}_${os}_${arch}/bin/gh
     download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
-  gimme:
-    <<: *defaults
-    download: https://github.com/travis-ci/gimme/archive/refs/tags/v${version}.tar.gz
-    extract: tar -xzC ${dest}/ --no-same-owner --strip-components=1 gimme-${version}/${utility}
   git-idm:
     <<: *defaults
     download: https://raw.githubusercontent.com/samrocketman/git-identity-manager/${version}/git-idm
