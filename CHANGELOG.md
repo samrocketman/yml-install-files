@@ -2,6 +2,7 @@
 
 - 💥 Bugfix reading from stdin from CLI arguments.  Setting `yaml_file=-`
   environment variable still works in earlier versions.
+- Utilities and examples updated
 
 # download-utilities v3.0
 
