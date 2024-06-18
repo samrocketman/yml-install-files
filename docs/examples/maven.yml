@@ -1,7 +1,7 @@
 versions:
-  maven.tar.gz: 3.9.6
+  maven.tar.gz: 3.9.8
 checksums:
-  maven.tar.gz: 6eedd2cae3626d6ad3a5c9ee324bd265853d64297f07f033430755bd0e0c3a4b
+  maven.tar.gz: 067672629075b740e3d0a928e21021dd615a53287af36d4ccca44e87e081d102
 utility:
   maven.tar.gz:
     dest: /tmp
