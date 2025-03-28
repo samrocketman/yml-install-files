@@ -1,3 +1,7 @@
+# download-utilities v3.2
+
+- Support setting `dest` with environment variable.
+
 # download-utilities v3.1
 
 - 💥 Bugfix reading from stdin from CLI arguments.  Setting `yaml_file=-`
