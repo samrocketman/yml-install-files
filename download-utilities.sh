@@ -246,7 +246,7 @@ setup_environment() {
   default_download="$(read_yaml "${args[@]}" default_download none)"
   default_download_extract="$(read_yaml "${args[@]}" default_download_extract none)"
   default_eval_shell="$(read_yaml "${args[@]}" default_eval_shell none)"
-  dest="$(read_yaml "${args[@]}" dest none)"
+  dest="$(read_yaml "${args[@]}" dest env)"
   download="$(read_yaml "${args[@]}" download none)"
   extension="$(read_yaml "${args[@]}" extension none)"
   extract="$(read_yaml "${args[@]}" extract none)"
