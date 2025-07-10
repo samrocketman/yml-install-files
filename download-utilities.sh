@@ -641,7 +641,9 @@ checksum_command() {
     fi
   done
   checksums_count="$(yq -r 'select(.checksums | type == "!!map").checksums | keys | length // 0' "$TMP_DIR/checksums.yml")"
-  if [ "$checksums_count" -gt 0 ]; then
+  # check if string zero-length
+  # bug report https://github.com/mikefarah/yq/issues/2419
+  if [ -n "${checksums_count:-}" ] && [ "$checksums_count" -gt 0 ]; then
     # post-process checksums to flatten checksum maps
     yq -r '.checksums | keys | .[]' "$TMP_DIR/checksums.yml" | while read -er util; do
       util_key=".checksums.\"${util}\""
