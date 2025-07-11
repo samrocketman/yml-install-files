@@ -1,3 +1,11 @@
+# download-utilities v3.5
+
+- Fix bugs introduced by v3.3 and v3.4 releases.
+- 💥 Bugfix: Also fixes a [change in behavior][yq-2#2419] introduced by yq
+  4.45.3.  Since releases v3.3 and v3.4 were invalid.
+
+[yq-2#2419]: https://github.com/mikefarah/yq/issues/2419
+
 # download-utilities v3.4
 
 - 💥 Bugfix: Another attempt at fixing a [change in behavior][yq-2#2419]

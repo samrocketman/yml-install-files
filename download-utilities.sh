@@ -1,5 +1,5 @@
 #!/bin/bash
-# download-utilities v3.4
+# download-utilities v3.5
 # Copyright (c) 2023-2024 Sam Gleske https://github.com/samrocketman/yml-install-files
 # MIT Licensed
 # Fri 19 May 2023 06:01:53 PM EDT initial release
@@ -70,7 +70,7 @@ get_yq_childkey_count() {
   local childkey_count
   yq_key="$1"
   yaml_file="$2"
-  childkey_count="$(yq -r "select(${yq_key} | type == "!!map")${yq_key} | keys | length // 0")"
+  childkey_count="$(yq -r "select(${yq_key} | type == "!!map")${yq_key} | keys | length // 0" "$yaml_file")"
   if [ -z "${childkey_count:-}" ]; then
     # bug report https://github.com/mikefarah/yq/issues/2419
     echo 0
