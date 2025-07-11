@@ -1,25 +1,25 @@
 versions:
-  clair: 4.7.4
-  crane: 0.19.2
-  cyclonedx: 0.25.1
-  docker-buildx: 0.15.0
-  docker-compose: 2.27.1
+  clair: 4.8.0
+  crane: 0.20.6
+  cyclonedx: 0.28.2
+  docker-buildx: 0.25.0
+  docker-compose: 2.38.2
   dumb-init: 1.2.5
-  gh: 2.51.0
-  git-idm: a598aece805228fcc404af7597fd5cd9d98f6d44
-  gitleaks: 8.18.4
-  goss: 0.4.7
-  helm: 3.15.2
-  jq: 1.7.1
-  kind: 0.23.0
-  kubeconform: 0.6.6
-  kubectl: 1.30.2
+  gh: 2.75.0
+  git-idm: 68c2ee1e406c2f2c72c8399e09564a970a025a0a
+  gitleaks: 8.27.2
+  goss: 0.4.9
+  helm: 3.18.4
+  jq: 1.8.1
+  kind: 0.29.0
+  kubeconform: 0.7.0
+  kubectl: 1.33.2
   kubeval: 0.16.1
-  kustomize: 5.4.2
-  minikube: 1.33.1
+  kustomize: 5.7.0
+  minikube: 1.36.0
   rvm-installer: 1.29.12
-  saml2aws: 2.36.16
-  yq: 4.44.2
+  saml2aws: 2.36.19
+  yq: 4.46.1
 checksums:
   clair:
     darwin: d237fdaedcce3a7c60c49ce21d2fc4b3f7cd2ed92f45364b2565340a1eca5f9b

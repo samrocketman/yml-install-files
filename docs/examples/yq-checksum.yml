@@ -1,13 +1,13 @@
 versions:
-  yq: 4.44.2
+  yq: 4.46.1
 checksums:
   yq:
     linux:
-      amd64: 246b781828353a59fb04ffaada241f78a8f3f25c623047b40306def1f6806e71
-      arm64: d05d9dae44503433e668d097143bfeb102ee7e2d486773ae23aaf81256ed54fd
+      amd64: c0eb42f6fbf928f0413422967983dcdf9806cc4dedc9394edc60c0dfb4a98529
+      arm64: 4ab0b301059348d671fc1833e99903c1fecc7ca287ac131f72dca0eb9a6ba87a
     darwin:
-      amd64: 6d3360c8c11cae7854069c832349acc50253d89b9d00b06700c7f99c8702d6ad
-      arm64: 6cfa3c2c3a44356d0da42d8204fc85730cea999a779058d94d3a5b96d83f1030
+      amd64: 4c290b4ad1da8557be6c030a9cecbef58b7cb8d4cb201b2d69cb1a5e00c22a9a
+      arm64: e639937c2718de6771ff62fe38d19486324c19b22a9b9441a4829070d07dfb70
 utility:
   yq:
     download: https://github.com/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}

@@ -1,5 +1,5 @@
 versions:
-  maven.tar.gz: 3.9.8
+  maven.tar.gz: 3.9.10
 checksums:
   maven.tar.gz: 067672629075b740e3d0a928e21021dd615a53287af36d4ccca44e87e081d102
 utility:
