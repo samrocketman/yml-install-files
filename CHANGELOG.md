@@ -1,3 +1,8 @@
+# download-utilities v3.6
+
+- Fix bug introduced by v3.3 and v3.4 releases.
+- Versions 3.3 through 3.5 releases are invalid.
+
 # download-utilities v3.5
 
 - Fix bugs introduced by v3.3 and v3.4 releases.
