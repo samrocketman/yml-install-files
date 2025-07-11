@@ -1,5 +1,5 @@
 #!/bin/bash
-# download-utilities v3.3
+# download-utilities v3.4
 # Copyright (c) 2023-2024 Sam Gleske https://github.com/samrocketman/yml-install-files
 # MIT Licensed
 # Fri 19 May 2023 06:01:53 PM EDT initial release
@@ -53,9 +53,8 @@ if [ -z "${default_verify_checksum:-}" ]; then
     default_verify_checksum='sha256sum -c -'
   fi
 fi
-export default_download default_download_extract \
-  default_download_head default_eval_shell default_verify_checksum \
-  default_yaml yq_mirror yq_version
+export default_download default_download_extract default_download_head \
+  default_eval_shell default_verify_checksum default_yaml yq_mirror yq_version
 
 yq() (
   if [ -x "${TMP_DIR:-}"/yq ]; then
@@ -64,6 +63,21 @@ yq() (
     command yq "$@"
   fi
 )
+
+get_yq_childkey_count() {
+  local yq_key
+  local yaml_file
+  local childkey_count
+  yq_key="$1"
+  yaml_file="$2"
+  childkey_count="$(yq -r "select(${yq_key} | type == "!!map")${yq_key} | keys | length // 0")"
+  if [ -z "${childkey_count:-}" ]; then
+    # bug report https://github.com/mikefarah/yq/issues/2419
+    echo 0
+  else
+    echo "$childkey_count"
+  fi
+}
 
 # $1=file $2=utility
 get_binary() (
@@ -208,8 +222,8 @@ redirect_utility() {
 # $1=file $2=utility
 setup_environment() {
   export arch checksum default_download default_download_extract \
-  default_eval_shell dest download extension extract only os owner perm \
-  post_command pre_command skip_if update utility version
+    default_eval_shell dest download extension extract only os owner perm \
+    post_command pre_command skip_if update utility version
   declare -a args
   args=( "$1" )
   if [ -z "${os:-}" ]; then
@@ -292,7 +306,6 @@ download_utility() (
   declare -a args
   args=( "$1" "${utility}" )
 
-  set_debug="set -euxo pipefail;"
   export checksum_failed
   if [ -n "${skip_checksum:-}" ]; then
     true
@@ -640,19 +653,17 @@ checksum_command() {
       get_binary "$yaml_file" "$util" | checksum
     fi
   done
-  checksums_count="$(yq -r 'select(.checksums | type == "!!map").checksums | keys | length // 0' "$TMP_DIR/checksums.yml")"
-  # check if string zero-length
-  # bug report https://github.com/mikefarah/yq/issues/2419
-  if [ -n "${checksums_count:-}" ] && [ "$checksums_count" -gt 0 ]; then
+  checksums_count="$(get_yq_childkey_count .checksums "$TMP_DIR/checksums.yml")"
+  if [ "$checksums_count" -gt 0 ]; then
     # post-process checksums to flatten checksum maps
     yq -r '.checksums | keys | .[]' "$TMP_DIR/checksums.yml" | while read -er util; do
       util_key=".checksums.\"${util}\""
-      util_childkey_count="$(yq -r "select(${util_key} | type == "'"!!map"'")${util_key} | keys | length // 0" "$TMP_DIR/checksums.yml")"
+      util_childkey_count="$(get_yq_childkey_count "$util_key" "$TMP_DIR/checksums.yml")"
       if [ "$util_childkey_count" -eq 0 ]; then
         continue
       fi
       yq -r "${util_key} | keys | .[]" "$TMP_DIR/checksums.yml" | while read -er childkey; do
-        childkey_count="$(yq -r "select(${util_key}.\"$childkey\" | type == "'"!!map"'")${util_key}.\"$childkey\" | keys | length // 0" "$TMP_DIR/checksums.yml")"
+        childkey_count="$(get_yq_childkey_count "${util_key}.\"$childkey\"" "$TMP_DIR/checksums.yml")"
         if [ ! "$childkey_count" -eq 1 ]; then
           continue
         fi
