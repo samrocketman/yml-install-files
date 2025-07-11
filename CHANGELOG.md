@@ -1,3 +1,9 @@
+# download-utilities v3.3
+
+- 💥 Bugfix: Work around [change in behavior][yq#2419] introduced by yq 4.45.3.
+
+[yq#2419]: https://github.com/mikefarah/yq/issues/2419
+
 # download-utilities v3.2
 
 - Support setting `dest` with environment variable.
