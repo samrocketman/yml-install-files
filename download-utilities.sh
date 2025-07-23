@@ -500,6 +500,9 @@ Example usage:
   Download a single utility (in this example the yq utility)
       download-utilities.sh download-utilities.yml yq
 
+  Download utilities with merged YAML
+      download-utilities.sh --override download-utilities.override.yml download-utilities.yml
+
 Optional Commands:
   --yq
       This is necessary if you are also installing yq via yaml.  This script
@@ -507,6 +510,15 @@ Optional Commands:
 
   --download
       Downloads utilities from provided YAML.
+
+  --override FILE
+      Overrides the base utitly.yaml before processing. This is a deep merge, so
+      the merge file takes precedence over the main file for conflicting keys.
+
+  --debug-yaml [FILE]
+      Output the final YAML configuration (after merging if --override
+      is used) and exit. If FILE is specified, write to that file,
+      otherwise output to stdout. Useful for debugging configuration merges.
 
   --checksum
       Creates a sha256 checksum of all files.  By default it assumes files were
@@ -526,6 +538,16 @@ Checksum options:
       architectures under OS.
 EOF
   exit 1
+}
+
+merge_yaml_files() {
+  local base_file="$1"
+  local merge_file="$2"
+  local output_file="$3"
+  
+  # Use yq to merge the YAML files, with merge_file taking precedence
+  # First copy the base file, then apply the merge file on top of it
+  yq eval '. *= load("'"$merge_file"'")' "$base_file" > "$output_file"
 }
 
 download_command() {
@@ -718,8 +740,26 @@ process_args() {
         desired_command="${1#--}"
         shift
         ;;
+      --debug-yaml)
+        debug_yaml=true
+        # Check if next argument exists and doesn't start with --
+        if [ $# -gt 1 ] && [[ ! "$2" =~ ^-- ]]; then
+          debug_yaml_file="$2"
+          shift
+        fi
+        shift
+        ;;
       --help|-h)
         help
+        ;;
+      --override)
+        if [ -z "$2" ] || [ ! -f "$2" ]; then
+          echo '--override requires a valid YAML file as the following argument.' >&2
+          exit 1
+        fi
+        override_yaml_file="$2"
+        shift
+        shift
         ;;
       --os-arch|-I)
         if [ ! "$(echo "$2" | tr -cd : | wc -c)" -eq 1 ]; then
@@ -753,6 +793,9 @@ process_args() {
 }
 
 export yaml_file
+export override_yaml_file
+export debug_yaml=false
+export debug_yaml_file=""
 declare -a subcommand
 declare -a inline_os_arch
 export inline_checksum=false
@@ -798,6 +841,29 @@ trap cleanup_on EXIT
 if [[ "${yaml_file}" == "-" ]]; then
   yaml_file="${TMP_DIR}/stdin.yaml"
   cat > "${yaml_file}"
+fi
+
+# Handle YAML merging if requested
+if [ -n "${override_yaml_file:-}" ]; then
+  merged_yaml_file="$(mktemp)"
+  merge_yaml_files "$yaml_file" "$override_yaml_file" "$merged_yaml_file"
+  yaml_file="$merged_yaml_file"
+fi
+
+# Debug YAML output if requested
+if [ "$debug_yaml" = true ]; then
+  if [ -n "$debug_yaml_file" ]; then
+    if [ "$yaml_file" != "$debug_yaml_file" ]; then
+      cp "$yaml_file" "$debug_yaml_file"
+      echo "Debug YAML written to: $debug_yaml_file" >&2
+    else
+      echo "Error: Debug output file cannot be the same as input file" >&2
+      exit 1
+    fi
+  else
+    cat "$yaml_file"
+  fi
+  exit 0
 fi
 
 check_yaml "$yaml_file"
