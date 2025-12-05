@@ -57,10 +57,15 @@ export default_download default_download_extract default_download_head \
   default_eval_shell default_verify_checksum default_yaml yq_mirror yq_version
 
 yq() (
+  YQ_OPTIONS="${YQ_OPTIONS:---yaml-fix-merge-anchor-to-spec}"
+  if [ "$YQ_OPTIONS" = none ]; then
+    unset YQ_OPTIONS
+  fi
   if [ -x "${TMP_DIR:-}"/yq ]; then
-    "${TMP_DIR:-}"/yq --yaml-fix-merge-anchor-to-spec "$@"
+    # YQ_OPTIONS is intentionally unquoted
+    "${TMP_DIR:-}"/yq ${YQ_OPTIONS:-} "$@"
   else
-    command yq --yaml-fix-merge-anchor-to-spec "$@"
+    command yq ${YQ_OPTIONS:-} "$@"
   fi
 )
 
