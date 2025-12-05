@@ -1,16 +1,16 @@
 utility:
   gh:
-    version: 2.75.0
+    version: 2.83.1
     download: https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${os}_${arch}.${extension}
     dest: ./scratch
     perm: '0755'
     checksum:
       macOS:
-        arm64: 969c4c719738b365702de3e3b16fa144cc1757c703b5c7964c0b81b3b81265dc
-        amd64: cee5c2dd0c4c421ae0d580ec1ec37a03f9fd84422ae7721d54ca54f767d920df
+        arm64: 36a67e2862458ccb817544a8bfd22a399f370d5860b4ae4e7f9d99a980fb4375
+        amd64: 454dbcb0db02b7010ca46fb3e7ec288ca5fbd6e9bd76b096dd622d5f2de64fdb
       linux:
-        arm64: d116205efae3a409cbfbec173b0e8eff65e676e1ed3b573393eeca17301f9fb3
-        amd64: 9c77b7d4d38be3f0e4c5656c6acfa916c8d24d7274d287447c5a12e468e44343
+        arm64: da2b6b67b52088c572ce22f3623352dd310f11ce1ebd8b5734d42ac195862c05
+        amd64: b6706daf46c457166e03991ccbd79c3369ed762468b22cfd359adc5b819f5eca
     os:
       Linux: linux
       Darwin: macOS
