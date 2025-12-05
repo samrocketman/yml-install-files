@@ -58,9 +58,9 @@ export default_download default_download_extract default_download_head \
 
 yq() (
   if [ -x "${TMP_DIR:-}"/yq ]; then
-    "${TMP_DIR:-}"/yq "$@"
+    "${TMP_DIR:-}"/yq --yaml-fix-merge-anchor-to-spec "$@"
   else
-    command yq "$@"
+    command yq --yaml-fix-merge-anchor-to-spec "$@"
   fi
 )
 
