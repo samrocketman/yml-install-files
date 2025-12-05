@@ -1,3 +1,8 @@
+# download-utilities v3.7
+
+- 💥 Bugfix: Fix `yq` warning spamming stdout.
+- Upgrade utilities.
+
 # download-utilities v3.6
 
 - Fix bug introduced by v3.3 and v3.4 releases.
