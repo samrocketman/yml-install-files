@@ -1,5 +1,5 @@
 #!/bin/bash
-# download-utilities v3.7
+# download-utilities v3.8
 # Copyright (c) 2023-2026 Sam Gleske https://github.com/samrocketman/yml-install-files
 # MIT Licensed
 # Fri 19 May 2023 06:01:53 PM EDT initial release
@@ -57,7 +57,7 @@ export default_download default_download_extract default_download_head \
   default_eval_shell default_verify_checksum default_yaml yq_mirror yq_version
 
 yq() (
-  YQ_OPTIONS="${YQ_OPTIONS:---yaml-fix-merge-anchor-to-spec}"
+  YQ_OPTIONS="${YQ_OPTIONS:-}"
   if [ "$YQ_OPTIONS" = none ]; then
     unset YQ_OPTIONS
   fi

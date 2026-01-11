@@ -1,3 +1,8 @@
+# download-utilities v3.8
+
+- Remove annoying yq error spam which throws errors on all yq releases except
+  for a select few.
+
 # download-utilities v3.7
 
 - 💥 Bugfix: Fix `yq` warning spamming stdout.
