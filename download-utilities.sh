@@ -1,6 +1,6 @@
 #!/bin/bash
 # download-utilities v3.7
-# Copyright (c) 2023-2024 Sam Gleske https://github.com/samrocketman/yml-install-files
+# Copyright (c) 2023-2026 Sam Gleske https://github.com/samrocketman/yml-install-files
 # MIT Licensed
 # Fri 19 May 2023 06:01:53 PM EDT initial release
 # Ubuntu 22.04.3 LTS
