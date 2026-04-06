@@ -16,6 +16,7 @@ utility:
     dest: /usr/local/bin # destination path to download utility
     downlaod: # a URL to download the utility
     extension: echo tar.gz # optional shell script to echo the extension
+    final_ext: # suffix for the installed file basename (OS/arch aware); see Variables
     extract: # pipe the download into this shell script e.g. extraction
     only: # a conditional shell script which can skip downloading if false
     skip_if: # a conditional shell script which can skip downloading if true
@@ -50,10 +51,18 @@ is a list of variables.
 - `${dest}`
 - `${download}`
 - `${extension}`
+- `${final_ext}` — suffix appended to `${utility}` for the installed file (for
+  example `.exe`). Resolved from YAML like other OS/arch-aware fields. When
+  YAML does not define `final_ext` and `${os}` is `Windows`, the script uses an
+  implied default of `.exe`.
 - `${os}`
 - `${owner}`
 - `${perm}`
-- `${utility}`
+- `${utility}` — logical utility name (basename without suffix).
+- `${utility_file}` — `${utility}${final_ext}`; the on-disk basename under
+  `${dest}` for downloads, checksum verification, `chmod`, and `chown`. Use
+  `${dest}/${utility_file}` in `pre_command`, `post_command`, or custom
+  `default_download` when you need the final path.
 
 > **Note:** keep in mind some variables like `os` or `arch` have translation.
 > All shell logic should be written with the final translation values in mind.

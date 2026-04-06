@@ -25,12 +25,12 @@ Different variable defaults depending on existence of `curl`.
 
 ```bash
 # if curl is detected these are the defaults
-default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
+default_download=$'curl -sSfLo \'${dest}/${utility_file}\' ${download}'
 default_download_extract='curl -sSfL ${download} | ${extract}'
 default_download_head='curl -sSfI ${download}'
 
 # alternate, fall back to wget if no curl
-default_download=$'wget -q -O \'${dest}/${utility}\' ${download}'
+default_download=$'wget -q -O \'${dest}/${utility_file}\' ${download}'
 default_download_extract='wget -q -O - ${download} | ${extract}'
 default_download_head=$'wget -q -S --spider -o - ${download} 2>&1 | tr -d \'\\r\''
 ```
@@ -86,6 +86,8 @@ Variables which control how utilities and archives get downloaded.
   archives (without extraction).
   - `dest` is a user-provided field in YAML.
   - `utility` is the same value as the key of the utility in YAML.
+  - `utility_file` is the on-disk basename (`${utility}${final_ext}`; on Windows,
+    `.exe` is implied when `final_ext` is unset in YAML).
   - `download` is a user-provided field in YAML.
 - `default_download_extract` - A small shell script which downloads and extracts
   archives.

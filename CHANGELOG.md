@@ -1,3 +1,11 @@
+# download-utilities v3.9
+
+- Add optional per-utility `final_ext` (OS/arch aware) for the installed file
+  basename and checksum path. `${extension}` remains for download URL templates
+  only. On Windows, when `final_ext` is omitted from YAML, the script implies
+  `.exe`. Export `final_ext` and `utility_file` (`${utility}${final_ext}`) for
+  use in custom scripts.
+
 # download-utilities v3.8
 
 - Remove annoying yq error spam which throws errors on all yq releases except
