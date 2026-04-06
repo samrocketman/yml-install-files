@@ -1,5 +1,5 @@
 #!/bin/bash
-# download-utilities v3.8
+# download-utilities v3.9
 # Copyright (c) 2023-2026 Sam Gleske https://github.com/samrocketman/yml-install-files
 # MIT Licensed
 # Fri 19 May 2023 06:01:53 PM EDT initial release
@@ -14,10 +14,10 @@ yq_mirror="${yq_mirror:-https://github.com}"
 yq_version="${yq_version:-}"
 if [ -z "${default_download:-}" ]; then
   if type -P curl > /dev/null; then
-    default_download=$'curl -sSfLo \'${dest}/${utility}\' ${download}'
+    default_download=$'curl -sSfLo \'${dest}/${utility_file}\' ${download}'
   else
     # try wget if curl not detected
-    default_download=$'wget -q -O \'${dest}/${utility}\' ${download}'
+    default_download=$'wget -q -O \'${dest}/${utility_file}\' ${download}'
   fi
 fi
 if [ -z "${default_download_extract:-}" ]; then
@@ -93,7 +93,7 @@ get_binary() (
     fi
     return "$retcode"
   fi
-  echo "${dest}/${utility}"
+  echo "${dest}/${utility_file}"
 )
 
 # $1=file $2=utility $3=field $4=one_of:[none, env, env_shell, shell]
@@ -227,8 +227,8 @@ redirect_utility() {
 # $1=file $2=utility
 setup_environment() {
   export arch checksum default_download default_download_extract \
-    default_eval_shell dest download extension extract only os owner perm \
-    post_command pre_command skip_if update utility version
+    default_eval_shell dest download extension extract final_ext only os owner \
+    perm post_command pre_command skip_if update utility utility_file version
   declare -a args
   args=( "$1" )
   if [ -z "${os:-}" ]; then
@@ -268,6 +268,11 @@ setup_environment() {
   dest="$(read_yaml "${args[@]}" dest env)"
   download="$(read_yaml "${args[@]}" download none)"
   extension="$(read_yaml "${args[@]}" extension none)"
+  final_ext="$(read_yaml "${args[@]}" final_ext none)"
+  if [ -z "${final_ext:-}" ] && [ "$os" = Windows ]; then
+    final_ext=.exe
+  fi
+  utility_file="${utility}${final_ext:-}"
   extract="$(read_yaml "${args[@]}" extract none)"
   only="$(read_yaml "${args[@]}" only none)"
   owner="$(read_yaml "${args[@]}" owner none)"
@@ -316,7 +321,7 @@ download_utility() (
     true
   elif [ -n "${checksum:-}" ]; then
     checksum_failed=true
-    if echo "${checksum}  ${dest}/${utility}" | \
+    if echo "${checksum}  ${dest}/${utility_file}" | \
       eval "${default_verify_checksum}"; then
       # checksum success
       checksum_failed=false
@@ -352,10 +357,10 @@ download_utility() (
   fi
   if [ "${inline_checksum:-false}" = false ]; then
     if [ -n "${perm:-}" ]; then
-      echo "chmod '${perm}' '${dest}/${utility}'" | eval_shell || return $?
+      echo "chmod '${perm}' '${dest}/${utility_file}'" | eval_shell || return $?
     fi
     if [ -n "${owner:-}" ]; then
-        echo "chown '${owner}' '${dest}/${utility}'" | eval_shell || return $?
+        echo "chown '${owner}' '${dest}/${utility_file}'" | eval_shell || return $?
     fi
   fi
 )
@@ -454,13 +459,22 @@ download_temp_yq() (
   elif [ "$arch" = aarch64 ]; then
     arch=arm64
   fi
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      _yq_utility_file=yq.exe
+      ;;
+    *)
+      _yq_utility_file=yq
+      ;;
+  esac
   (
     dest="${TMP_DIR}"
     utility=yq
+    utility_file="${_yq_utility_file}"
     download="${yq_mirror}/mikefarah/yq/releases/download/v${version}/yq_${os}_${arch}"
     echo "$default_download" | env_shell | eval_shell || return $?
   )
-  chmod 755 "${TMP_DIR}"/yq
+  chmod 755 "${TMP_DIR}/${_yq_utility_file}"
   if [ ! "$(yq '.test' <<< 'test: success')" = success ]; then
     return 1
   fi

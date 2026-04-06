@@ -39,6 +39,7 @@ Static text fields (no shell scripting or substitution available).
 - `default_eval_shell`
 - `dest`
 - `extension`
+- `final_ext`
 - `owner`
 - `perm`
 - `version`
@@ -72,6 +73,8 @@ documented in [Environment Variables](environment-variables.md).
 
 The following variables are supported and not otherwise documented.
 
+- `utility_file` — basename of the installed file: `${utility}${final_ext}`. On
+  Windows, if `final_ext` is not set in YAML, the script implies `.exe`.
 - `checksum_failed` - will be `true` or `false` depending on the checksum
   validation of the downloaded file.  If `skip_checksum` is set, then this value
   will be empty.  If you use this in scripting, then checking for a sane default
@@ -111,13 +114,13 @@ The `download` YAML URL gets downloaded with `curl`.  If you do not define any
 extraction command, then the curl command looks like the following.
 
 ```bash
-curl -sSfLo ${dest}/${utility} ${download}
+curl -sSfLo ${dest}/${utility_file} ${download}
 ```
 
 You can override this in your YAML with:
 
 ```yaml
-default_download: "wget -q -O '${dest}/${utility}' ${download}"
+default_download: "wget -q -O '${dest}/${utility_file}' ${download}"
 ```
 
 ### Shell substitution scripting
@@ -144,7 +147,7 @@ See [checksums.md](checksums.md)
 If you define `extract` YAML, then the defined shell script should expect the
 downloaded file to `stdin`.  The `extract` script is responsible for ensuring
 the final download or extraction location of the utility ends up in
-`${dest}/${utility}`.
+`${dest}/${utility_file}`.
 
 ```bash
 curl -sSfL ${url} | ${extract}
